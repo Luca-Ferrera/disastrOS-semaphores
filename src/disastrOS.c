@@ -309,6 +309,10 @@ int disastrOS_openSemaphore(const char* sem_name) {
   return disastrOS_syscall(DSOS_CALL_SEMOPEN, sem_name);
 }
 
+int disastrOS_semWait(Semaphore* sem){
+  return disastrOS_syscall(DSOS_CALL_SEMWAIT, sem);
+}
+
 void disastrOS_printStatus(){
   printf("****************** DisastrOS ******************\n");
   printf("Running: ");

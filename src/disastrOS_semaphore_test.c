@@ -5,6 +5,13 @@
 #include "disastrOS.h"
 
 #define SEM_NAME "test"
+#define BUFFER_SIZE 128
+
+int transactions[BUFFER_SIZE];  // circular buffer
+int read_index;     // index of the next slot containing information to be read
+int write_index;    // index of the next available slot for writing
+
+//TODO: should we declare semaphores globaly?
 
 // we need this to handle the sleep state
 void sleeperFunction(void* args){
@@ -13,6 +20,51 @@ void sleeperFunction(void* args){
     getc(stdin);
     disastrOS_printStatus();
   }
+}
+
+/** Producer **/
+void* producerJob(void* arg) {
+    while (1) {
+        // produce the item
+        int currentTransaction = 1;
+
+        int ret = disastrOS_semWait(&empty_sem);
+        //TODO: manage error
+
+        // write the item and update write_index accordingly
+        transactions[write_index] = currentTransaction;
+        write_index = (write_index + 1) % BUFFER_SIZE;
+
+        //ret = disastrOS_semPost(&fill_sem)
+        //TODO: manage error
+    }
+}
+
+/** Consumer **/
+void* consumerJob(void* arg) {
+    while (1) {
+        int ret = disastrOS_semWait(&fill_sem);
+        //TODO: manage error
+
+        ret = disastrOS_semWait(&stop_producer);
+        //TODO: manage error
+
+        // get the item and update read_index accordingly
+        int lastTransaction = transactions[read_index];
+        read_index = (read_index + 1) % BUFFER_SIZE;
+
+        //ret = disastroOS_semPost(&stop_producer);
+        //TODO: manage error
+
+        //ret = disastrOS_semPost(&empty_sem);
+        //TODO: manage error
+
+        // consume the item
+        deposit += lastTransaction;
+        if (read_index % 10 == 0) {
+            printf("After the last 10 transactions balance is now %d.\n", deposit);
+        }
+    }
 }
 
 void childFunction(void* args){
@@ -61,6 +113,8 @@ int main(int argc, char** argv){
   if (argc>1) {
     logfilename=argv[1];
   }
+  write_index = 0;
+  read_index = 0;
   // we create the init process processes
   // the first is in the running variable
   // the others are in the ready queue

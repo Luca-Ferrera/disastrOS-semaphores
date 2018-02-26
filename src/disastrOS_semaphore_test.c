@@ -3,8 +3,10 @@
 #include <poll.h>
 
 #include "disastrOS.h"
+#include "disastrOS_semaphore.h"
 
-#define SEM_NAME "test"
+#define THREADS_NUM 1
+#define SEM_NAME 100
 
 // we need this to handle the sleep state
 void sleeperFunction(void* args){
@@ -19,7 +21,7 @@ void childFunction(void* args){
   printf("Hello, I am the child function %d\n",disastrOS_getpid());
   printf("I will iterate a bit, before terminating\n");
 
-  int sem_id = disastrOS_openSemaphore(SEM_NAME);
+  int sem_id = disastrOS_openSemaphore(SEM_NAME, 10);
   printf("sem_id=%d\n", sem_id);
   
   for (int i=0; i<(disastrOS_getpid()+1); ++i){
@@ -36,9 +38,9 @@ void initFunction(void* args) {
   disastrOS_spawn(sleeperFunction, 0);
   
 
-  printf("I feel like to spawn 10 nice threads\n");
+  printf("I feel like to spawn %d nice threads\n", THREADS_NUM);
   int alive_children=0;
-  for (int i=0; i<10; ++i) {
+  for (int i=0; i<THREADS_NUM; ++i) {
     disastrOS_spawn(childFunction, 0);
     alive_children++;
   }

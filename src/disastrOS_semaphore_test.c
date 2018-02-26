@@ -6,12 +6,18 @@
 #include "disastrOS_semaphore.h"
 
 #define THREADS_NUM 1
-#define SEM_ID 1
+#define PRODUCERS_SEM_ID 1
+#define CONSUMERS_SEM_ID 2
 #define BUFFER_SIZE 128
 
 int transactions[BUFFER_SIZE];  // circular buffer
 int read_index;     // index of the next slot containing information to be read
 int write_index;    // index of the next available slot for writing
+Semaphore* empty_sem;
+Semaphore* fill_sem;
+Semaphore* consumers_sem;
+Semaphore* producers_sem;
+int deposit;
 
 //TODO: should we declare semaphores globaly?
 
@@ -44,11 +50,12 @@ void* producerJob(void* arg) {
 
 /** Consumer **/
 void* consumerJob(void* arg) {
+    Semaphore* consumer_sem = disastrOS_openSemaphore(CONSUMERS_SEM_ID);
     while (1) {
         int ret = disastrOS_semWait(&fill_sem);
         //TODO: manage error
 
-        ret = disastrOS_semWait(&stop_producer);
+        ret = disastrOS_semWait(&producers_sem);
         //TODO: manage error
 
         // get the item and update read_index accordingly
@@ -73,9 +80,9 @@ void childFunction(void* args){
   printf("Hello, I am the child function %d\n",disastrOS_getpid());
   printf("I will iterate a bit, before terminating\n");
 
-  int sem_id = disastrOS_openSemaphore(SEM_ID, 10);
-  printf("sem_id=%d\n", sem_id);
-  
+  disastrOS_openSemaphore(PRODUCERS_SEM_ID, BUFFER_SIZE);
+  disastrOS_openSemaphore(CONSUMERS_SEM_ID, 0);
+ 
   for (int i=0; i<(disastrOS_getpid()+1); ++i){
     printf("PID: %d, iterate %d\n", disastrOS_getpid(), i);
     disastrOS_sleep((20-disastrOS_getpid())*5);

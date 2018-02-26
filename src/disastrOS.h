@@ -1,6 +1,7 @@
 #pragma once
 #include "disastrOS_pcb.h"
 #include "linked_list.h"
+#include "disastrOS_semaphore.h"
 
 #ifdef _DISASTROS_DEBUG_
 #include <stdio.h>
@@ -37,7 +38,7 @@ int disastrOS_closeResource(int fd) ;
 int disastrOS_destroyResource(int resource_id);
 
 // sempahores
-Semaphore* disastrOS_openSemaphore(const int sem_id, int count);
+int disastrOS_openSemaphore(const int sem_id, ...);
 int disastrOS_semWait(Semaphore* sem);
 
 // debug function, prints the state of the internal system

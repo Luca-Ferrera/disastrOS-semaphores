@@ -8,4 +8,5 @@
 
 void internal_semWait(){
   // do stuff :)
+  Semaphore* sem = running->syscall_args[0];
 }

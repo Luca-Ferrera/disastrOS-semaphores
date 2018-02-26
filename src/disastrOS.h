@@ -37,7 +37,7 @@ int disastrOS_closeResource(int fd) ;
 int disastrOS_destroyResource(int resource_id);
 
 // sempahores
-int disastrOS_openSemaphore(const int sem_id, int count);
+Semaphore* disastrOS_openSemaphore(const int sem_id, int count);
 int disastrOS_semWait(Semaphore* sem);
 
 // debug function, prints the state of the internal system

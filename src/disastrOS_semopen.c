@@ -14,9 +14,9 @@ void internal_semOpen(){
   Semaphore* sem = SemaphoreList_byId(&running->sem_descriptors, sem_id);
   if (sem) {
     printf("Semaphore with id %d already existing, returning it\n", sem_id);
-    running->syscall_retvalue = sem->id;
+    running->syscall_retvalue = sem;
   }
 
   printf("Semaphore with id %d doesn't exist, allocating it\n", sem_id);
-  running->syscall_retvalue = Semaphore_alloc(sem_id, count)->id;
+  running->syscall_retvalue = Semaphore_alloc(sem_id, count);
 }

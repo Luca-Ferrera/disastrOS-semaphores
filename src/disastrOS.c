@@ -305,7 +305,7 @@ int disastrOS_destroyResource(int resource_id) {
   return disastrOS_syscall(DSOS_CALL_DESTROY_RESOURCE, resource_id);
 }
 
-int disastrOS_openSemaphore(const int sem_id, int count) {
+Semaphore* disastrOS_openSemaphore(const int sem_id, int count) {
   return disastrOS_syscall(DSOS_CALL_SEMOPEN, sem_id, count);
 }
 

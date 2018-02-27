@@ -3,7 +3,7 @@
 #include "disastrOS_pcb.h"
 
 
-typedef struct {
+typedef struct Semaphore {
   ListItem list;
   int id;
   int count; // counter for semaphore

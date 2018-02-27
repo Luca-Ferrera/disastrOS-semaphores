@@ -5,6 +5,6 @@
 *.o
 
 # Compiled binaries
-disastrOS_semaphore_test
+disastrOS_test
 disastrOS_semaphore_test
 libdisastrOS.a

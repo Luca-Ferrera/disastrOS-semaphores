@@ -6,8 +6,10 @@
 #include "disastrOS_semaphore.h"
 
 #define THREADS_NUM 1
-#define PRODUCERS_SEM_ID 1
-#define CONSUMERS_SEM_ID 2
+#define EMPTY_SEM_ID 0
+#define FILL_SEM_ID 1
+#define PRODUCERS_SEM_ID 2
+#define CONSUMERS_SEM_ID 3
 #define BUFFER_SIZE 128
 
 int transactions[BUFFER_SIZE];  // circular buffer
@@ -50,7 +52,7 @@ void* producerJob(void* arg) {
 
 /** Consumer **/
 void* consumerJob(void* arg) {
-    Semaphore* consumer_sem = disastrOS_openSemaphore(CONSUMERS_SEM_ID);
+    int ret = disastrOS_openSemaphore(consumers_sem, CONSUMERS_SEM_ID);
     while (1) {
         int ret = disastrOS_semWait(&fill_sem);
         //TODO: manage error
@@ -79,10 +81,16 @@ void* consumerJob(void* arg) {
 void childFunction(void* args){
   printf("Hello, I am the child function %d\n",disastrOS_getpid());
   printf("I will iterate a bit, before terminating\n");
+  int ret;
 
-  disastrOS_openSemaphore(PRODUCERS_SEM_ID, BUFFER_SIZE);
-  disastrOS_openSemaphore(CONSUMERS_SEM_ID, 0);
+  // Creating empty and fill semaphores
+  ret = disastrOS_openSemaphore(empty_sem, EMPTY_SEM_ID, BUFFER_SIZE);
+  ret = disastrOS_openSemaphore(fill_sem, FILL_SEM_ID, 0);
  
+  // Creating producers/consumers mutex semaphores
+  ret = disastrOS_openSemaphore(producers_sem, PRODUCERS_SEM_ID, 1);
+  ret = disastrOS_openSemaphore(consumers_sem, CONSUMERS_SEM_ID, 1);
+
   for (int i=0; i<(disastrOS_getpid()+1); ++i){
     printf("PID: %d, iterate %d\n", disastrOS_getpid(), i);
     disastrOS_sleep((20-disastrOS_getpid())*5);

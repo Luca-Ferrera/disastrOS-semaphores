@@ -5,7 +5,8 @@
 #include "disastrOS.h"
 #include "disastrOS_semaphore.h"
 
-#define THREADS_NUM 1
+#define PRODUCERS_NUM 1
+#define CONSUMERS_NUM 1
 #define EMPTY_SEM_ID 0
 #define FILL_SEM_ID 1
 #define PRODUCERS_SEM_ID 2
@@ -33,6 +34,7 @@ void sleeperFunction(void* args){
 }
 
 /** Producer **/
+// TODO: Why does the func return a void* ?
 void* producerJob(void* arg) {
     while (1) {
         // produce the item
@@ -51,6 +53,7 @@ void* producerJob(void* arg) {
 }
 
 /** Consumer **/
+// TODO: Why does the func return a void* ?
 void* consumerJob(void* arg) {
     int ret = disastrOS_openSemaphore(consumers_sem, CONSUMERS_SEM_ID);
     while (1) {
@@ -81,20 +84,12 @@ void* consumerJob(void* arg) {
 void childFunction(void* args){
   printf("Hello, I am the child function %d\n",disastrOS_getpid());
   printf("I will iterate a bit, before terminating\n");
-  int ret;
 
-  // Creating empty and fill semaphores
-  ret = disastrOS_openSemaphore(empty_sem, EMPTY_SEM_ID, BUFFER_SIZE);
-  ret = disastrOS_openSemaphore(fill_sem, FILL_SEM_ID, 0);
- 
-  // Creating producers/consumers mutex semaphores
-  ret = disastrOS_openSemaphore(producers_sem, PRODUCERS_SEM_ID, 1);
-  ret = disastrOS_openSemaphore(consumers_sem, CONSUMERS_SEM_ID, 1);
+  // if (((int*) args)[0] == PRODUCERS_SEM_ID)
+  //   producerJob(PRODUCERS_SEM_ID);
+  // else if (((int*) args)[0] == CONSUMERS_SEM_ID)
+  //   consumerJob(CONSUMERS_SEM_ID);
 
-  for (int i=0; i<(disastrOS_getpid()+1); ++i){
-    printf("PID: %d, iterate %d\n", disastrOS_getpid(), i);
-    disastrOS_sleep((20-disastrOS_getpid())*5);
-  }
   disastrOS_exit(disastrOS_getpid()+1);
 }
 
@@ -104,11 +99,27 @@ void initFunction(void* args) {
   printf("hello, I am init and I just started\n");
   disastrOS_spawn(sleeperFunction, 0);
   
+  int i, ret;
+  // Creating empty and fill semaphores
+  ret = disastrOS_openSemaphore(empty_sem, EMPTY_SEM_ID, BUFFER_SIZE);
+  // Reopening the same just for testing purposes
+  ret = disastrOS_openSemaphore(empty_sem, EMPTY_SEM_ID);
+  ret = disastrOS_openSemaphore(fill_sem, FILL_SEM_ID, 0);
+ 
+  // Creating producers/consumers mutex semaphores
+  ret = disastrOS_openSemaphore(producers_sem, PRODUCERS_SEM_ID, 1);
+  ret = disastrOS_openSemaphore(consumers_sem, CONSUMERS_SEM_ID, 1);
 
-  printf("I feel like to spawn %d nice threads\n", THREADS_NUM);
+  printf("[+] Creating %d producers and %d consumers\n", PRODUCERS_NUM, CONSUMERS_NUM);
+
   int alive_children=0;
-  for (int i=0; i<THREADS_NUM; ++i) {
-    disastrOS_spawn(childFunction, 0);
+  int job_type;
+  for (int i = 0, job_type = PRODUCERS_SEM_ID; i<PRODUCERS_NUM; ++i) {
+    disastrOS_spawn(childFunction, &job_type);
+    alive_children++;
+  }
+  for (int i = 0, job_type = CONSUMERS_SEM_ID; i<CONSUMERS_NUM; ++i) {
+    disastrOS_spawn(childFunction, &job_type);
     alive_children++;
   }
 

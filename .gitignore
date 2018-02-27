@@ -1,3 +1,10 @@
+# VSCode config files
 .vscode
 
+# Object files
 *.o
+
+# Compiled binaries
+disastrOS_semaphore_test
+disastrOS_semaphore_test
+libdisastrOS.a

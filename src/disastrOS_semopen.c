@@ -18,14 +18,15 @@ void internal_semOpen(){
   if (!(initialized++)) Semaphore_init();
 
   // Check if a semaphore with the same ID is already open
-  sem = SemaphoreList_byId(&running->sem_descriptors, sem_id);
+  sem = SemaphoreList_byId(&semaphores_list, sem_id);
   if (sem) {
-    printf("[*] Semaphore with id %d already existing, returning it\n", sem_id);
+    printf("[*] Semaphore with id %d already exists, returning it\n", sem_id);
     running->syscall_retvalue = sem->id;
   }
 
-  // Create a semaphore with the given ID
   printf("[+] Semaphore with id %d doesn't exist, allocating it\n", sem_id);
   sem = Semaphore_alloc(sem_id, count);
+  // Add created semaphore to global list
+  List_insert(&semaphores_list, semaphores_list.last, &(sem->list));
   running->syscall_retvalue = sem->id;
 }

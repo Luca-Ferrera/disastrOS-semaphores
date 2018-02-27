@@ -26,9 +26,6 @@ ListHead timer_list;
 // a resource can be a device, a file or an ipc thing
 ListHead resources_list;
 
-// global list of semaphores
-ListHead semaphores_list;
-
 SyscallFunctionType syscall_vector[DSOS_MAX_SYSCALLS];
 int syscall_numarg[DSOS_MAX_SYSCALLS];
 

@@ -312,7 +312,7 @@ int disastrOS_openSemaphore(const int sem_id, const int oflag, ...) {
   int count = va_arg(ap, int);
   va_end(ap);
 
-  return disastrOS_syscall(DSOS_CALL_SEMOPEN, sem_id, mode, count);
+  return disastrOS_syscall(DSOS_CALL_SEMOPEN, sem_id, oflag, count);
 }
 
 int disastrOS_semWait(Semaphore* sem){

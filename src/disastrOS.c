@@ -312,7 +312,8 @@ int disastrOS_openSemaphore(Semaphore* sem, const int sem_id, ...) {
 }
 
 int disastrOS_semWait(Semaphore* sem){
-  return disastrOS_syscall(DSOS_CALL_SEMWAIT, sem);
+  sem_id = sem->id
+  return disastrOS_syscall(DSOS_CALL_SEMWAIT, sem_id);
 }
 
 void disastrOS_printStatus(){

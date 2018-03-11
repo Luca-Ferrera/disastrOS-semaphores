@@ -111,7 +111,7 @@ void initFunction(void* args) {
   ret = disastrOS_openSemaphore(consumers_sem, CONSUMERS_SEM_ID, 1);
 
   disastrOS_printStatus();
-  printf("shutdown!");
+  printf("Shutdown!\n");
   disastrOS_shutdown();
 
   printf("[+] Creating %d producers and %d consumers\n", PRODUCERS_NUM, CONSUMERS_NUM);

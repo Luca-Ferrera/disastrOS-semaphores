@@ -143,6 +143,10 @@ void disastrOS_start(void (*f)(void*), void* f_args, char* logfile){
   Timer_init();
   Resource_init();
   Descriptor_init();
+
+  Semaphore_init();
+  SemDescriptor_init();
+
   init_pcb=0;
 
   // populate the vector of syscalls and number of arguments for each syscall
@@ -302,13 +306,13 @@ int disastrOS_destroyResource(int resource_id) {
   return disastrOS_syscall(DSOS_CALL_DESTROY_RESOURCE, resource_id);
 }
 
-int disastrOS_openSemaphore(Semaphore* sem, const int sem_id, ...) {
+int disastrOS_openSemaphore(const int sem_id, ...) {
   va_list ap;
   va_start(ap, sem_id);
   int count = va_arg(ap, int);
   va_end(ap);
 
-  return disastrOS_syscall(DSOS_CALL_SEMOPEN, sem, sem_id, count);
+  return disastrOS_syscall(DSOS_CALL_SEMOPEN, sem_id, count);
 }
 
 int disastrOS_semWait(Semaphore* sem){

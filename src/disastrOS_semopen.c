@@ -6,20 +6,10 @@
 #include "disastrOS_semaphore.h"
 #include "disastrOS_semdescriptor.h"
 
-unsigned char semaphore_pool_allocator_init = 0; // global variable for Semaphore structures intialization
-unsigned char sem_desc_pool_allocator_init = 0;
-
 void internal_semOpen(){
-  Semaphore* sem = (Semaphore*) running->syscall_args[0];
-  int sem_id = running->syscall_args[1];
-  int count = running->syscall_args[2];
+  int sem_id = running->syscall_args[0];
+  int count = running->syscall_args[1];
   printf("[*] PID %d requested open of semaphore %d\n", running->pid, sem_id);
-
-  // Initialize the semaphore pool allocatr once
-  if (!semaphore_pool_allocator_init) {
-    Semaphore_init();
-    semaphore_pool_allocator_init = 1;
-  }
 
   // Check if a semaphore with the requested ID is already open
   sem = SemaphoreList_byId(&semaphores_list, sem_id);
@@ -28,12 +18,6 @@ void internal_semOpen(){
     sem = Semaphore_alloc(sem_id, count);
     // Add created semaphore to global list
     List_insert(&semaphores_list, semaphores_list.last, &(sem->list));
-  }
-
-  // Initialize the sem desc pool allocatr once
-  if (!sem_desc_pool_allocator_init) {
-    SemDescriptor_init();
-    sem_desc_pool_allocator_init = 1;
   }
 
   SemDescriptor* desc = SemDescriptor_alloc(running->last_sem_fd, sem, running);

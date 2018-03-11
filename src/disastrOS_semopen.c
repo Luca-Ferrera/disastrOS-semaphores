@@ -55,7 +55,7 @@ void internal_semOpen(){
   List_insert(&sem->descriptors, sem->descriptors.last, (ListItem*) desc_ptr);
 
   // return the created SemdDescriptor to the process
-  printf("[*] End of semOpen with id %d for process %d and flags %d\n", sem_id, running->pid, oflag);
-  SemaphoreList_print(&semaphores_list);
+  // printf("[*] End of semOpen with id %d for process %d and flags %d\n", sem_id, running->pid, oflag);
+  // SemaphoreList_print(&semaphores_list);
   running->syscall_retvalue = desc->fd;
 }

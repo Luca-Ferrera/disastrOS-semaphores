@@ -17,7 +17,6 @@ void internal_semOpen(){
   Semaphore* sem = SemaphoreList_byId(&semaphores_list, sem_id);
   if (oflag & DSOS_CREATE) {
     if (sem) {
-      printf("[!] Semaphore with id %d already exists, returning DSOS_ESEMAPHORECREATE\n", sem_id);
       running->syscall_retvalue = DSOS_ESEMAPHORECREATE;
       return;
     }

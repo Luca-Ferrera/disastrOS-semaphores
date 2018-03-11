@@ -101,14 +101,14 @@ void initFunction(void* args) {
   
   int i, ret;
   // Creating empty and fill semaphores
-  empty_sem = disastrOS_openSemaphore(EMPTY_SEM_ID, BUFFER_SIZE);
+  empty_sem = disastrOS_openSemaphore(EMPTY_SEM_ID, DSOS_CREATE | DSOS_EXCL ,BUFFER_SIZE);
   // Reopening the same just for testing purposes
-  empty_sem = disastrOS_openSemaphore(EMPTY_SEM_ID);
-  fill_sem = disastrOS_openSemaphore(FILL_SEM_ID, 0);
+  empty_sem = disastrOS_openSemaphore(EMPTY_SEM_ID, DSOS_CREATE);
+  fill_sem = disastrOS_openSemaphore(FILL_SEM_ID, DSOS_CREATE | DSOS_EXCL, 0);
  
   // Creating producers/consumers mutex semaphores
-  producers_sem = disastrOS_openSemaphore(PRODUCERS_SEM_ID, 1);
-  consumers_sem = disastrOS_openSemaphore(CONSUMERS_SEM_ID, 1);
+  producers_sem = disastrOS_openSemaphore(PRODUCERS_SEM_ID, DSOS_CREATE | DSOS_EXCL, 1);
+  consumers_sem = disastrOS_openSemaphore(CONSUMERS_SEM_ID, DSOS_CREATE | DSOS_EXCL, 1);
 
   disastrOS_printStatus();
   printf("Shutdown!\n");

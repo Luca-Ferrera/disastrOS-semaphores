@@ -40,7 +40,7 @@ int disastrOS_destroyResource(int resource_id);
 // Sempahores
 ListHead semaphores_list; // global list of semaphores
 
-int disastrOS_openSemaphore(const int sem_id, const int mode, ...);
+int disastrOS_openSemaphore(const int sem_id, const int oflag, ...);
 int disastrOS_semWait(Semaphore* sem);
 
 // debug function, prints the state of the internal system

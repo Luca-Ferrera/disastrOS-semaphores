@@ -306,7 +306,7 @@ int disastrOS_destroyResource(int resource_id) {
   return disastrOS_syscall(DSOS_CALL_DESTROY_RESOURCE, resource_id);
 }
 
-int disastrOS_openSemaphore(const int sem_id, const int mode, ...) {
+int disastrOS_openSemaphore(const int sem_id, const int oflag, ...) {
   va_list ap;
   va_start(ap, sem_id);
   int count = va_arg(ap, int);

@@ -9,27 +9,51 @@
 void internal_semOpen(){
   // (1) get from PCB the ID and optional count of the semaphore to be opened
   int sem_id = running->syscall_args[0];
-  int open_type = running->syscall_args[1];
+  int oflag = running->syscall_args[1];
   int count = running->syscall_args[2];
   printf("[*] PID %d requested open of semaphore %d\n", running->pid, sem_id);
 
   // (2) Check if a semaphore with the requested ID is already opened
   Semaphore* sem = SemaphoreList_byId(&semaphores_list, sem_id);
-  if (!sem) {
+  if (oflag & DSOS_CREATE) {
+    if (!sem) {
+      running->syscall_retvalue = DSOS_ESEMAPHORECREATE;
+      return;
+    }
     printf("[+] Semaphore with id %d doesn't exist, allocating it\n", sem_id);
     sem = Semaphore_alloc(sem_id, count);
     // Add created semaphore to global list
     List_insert(&semaphores_list, semaphores_list.last, &(sem->list));
   }
 
-  SemDescriptor* desc = SemDescriptor_alloc(running->last_sem_fd, sem, running);
+  //  (3) Check that everything is okay
+  // We should have the semaphore now, otherwise an error occured
+  if (!sem) {
+    running->syscall_retvalue = DSOS_ESEMAPHOREOPEN;
+    return;
+  }
+  // If an exclusive opening was requested but other processes already retain the semaphore return an error
+  if ((oflag & DSOS_EXCL) && sem->descriptors.size) {
+    running->syscall_retvalue = DSOS_ESEMAPHORENOEXCL;
+    return;
+  }
 
-  ++(running->last_sem_fd);
+  // (5) Create the descriptor for the resource in this process, and add it to
+  //  the process descriptor list. Assign to the resource a new fd
+  SemDescriptor* desc = SemDescriptor_alloc(running->last_sem_fd, sem, running);
+  if (!desc){
+     running->syscall_retvalue=DSOS_ERESOURCENOFD;
+     return;
+  }
+  ++(running->last_sem_fd); // increment last fd number
   SemDescriptorPtr* desc_ptr = SemDescriptorPtr_alloc(desc);
   List_insert(&running->sem_descriptors, running->sem_descriptors.last, (ListItem*) desc_ptr);
 
+
+  // (6) Append the SemDescriptorPtr in the list
   desc->ptr = desc_ptr;
   List_insert(&sem->descriptors, sem->descriptors.last, (ListItem*) desc_ptr);
 
-  running->syscall_retvalue = sem->id;
+  // return the created SemdDescriptor to the process
+  running->syscall_retvalue = desc->fd;
 }

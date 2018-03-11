@@ -7,12 +7,14 @@
 #include "disastrOS_semdescriptor.h"
 
 void internal_semOpen(){
+  // (1) get from PCB the ID and optional count of the semaphore to be opened
   int sem_id = running->syscall_args[0];
-  int count = running->syscall_args[1];
+  int open_type = running->syscall_args[1];
+  int count = running->syscall_args[2];
   printf("[*] PID %d requested open of semaphore %d\n", running->pid, sem_id);
 
-  // Check if a semaphore with the requested ID is already open
-  sem = SemaphoreList_byId(&semaphores_list, sem_id);
+  // (2) Check if a semaphore with the requested ID is already opened
+  Semaphore* sem = SemaphoreList_byId(&semaphores_list, sem_id);
   if (!sem) {
     printf("[+] Semaphore with id %d doesn't exist, allocating it\n", sem_id);
     sem = Semaphore_alloc(sem_id, count);

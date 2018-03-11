@@ -16,10 +16,10 @@
 int transactions[BUFFER_SIZE];  // circular buffer
 int read_index;     // index of the next slot containing information to be read
 int write_index;    // index of the next available slot for writing
-Semaphore* empty_sem;
-Semaphore* fill_sem;
-Semaphore* consumers_sem;
-Semaphore* producers_sem;
+int empty_sem;
+int fill_sem;
+int consumers_sem;
+int producers_sem;
 int deposit;
 
 //TODO: should we declare semaphores globaly?
@@ -101,14 +101,14 @@ void initFunction(void* args) {
   
   int i, ret;
   // Creating empty and fill semaphores
-  ret = disastrOS_openSemaphore(empty_sem, EMPTY_SEM_ID, BUFFER_SIZE);
+  empty_sem = disastrOS_openSemaphore(EMPTY_SEM_ID, BUFFER_SIZE);
   // Reopening the same just for testing purposes
-  ret = disastrOS_openSemaphore(empty_sem, EMPTY_SEM_ID);
-  ret = disastrOS_openSemaphore(fill_sem, FILL_SEM_ID, 0);
+  empty_sem = disastrOS_openSemaphore(EMPTY_SEM_ID);
+  fill_sem = disastrOS_openSemaphore(FILL_SEM_ID, 0);
  
   // Creating producers/consumers mutex semaphores
-  ret = disastrOS_openSemaphore(producers_sem, PRODUCERS_SEM_ID, 1);
-  ret = disastrOS_openSemaphore(consumers_sem, CONSUMERS_SEM_ID, 1);
+  producers_sem = disastrOS_openSemaphore(PRODUCERS_SEM_ID, 1);
+  consumers_sem = disastrOS_openSemaphore(CONSUMERS_SEM_ID, 1);
 
   disastrOS_printStatus();
   printf("Shutdown!\n");

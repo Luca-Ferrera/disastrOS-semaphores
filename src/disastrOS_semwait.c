@@ -11,7 +11,7 @@ void internal_semWait(){
   Semaphore* sem = SemaphoreList_byId(&semaphores_list, sem_id);
   if(!sem){
     running->syscall_retvalue = DSOS_ERESEMAPHORE;
-    return
+    return;
   }
   sem->count-=1;
   if(sem->count < 0){

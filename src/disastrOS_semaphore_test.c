@@ -40,7 +40,7 @@ void* producerJob(void* arg) {
         // produce the item
         int currentTransaction = 1;
 
-        int ret = disastrOS_semWait(&empty_sem);
+        int ret = disastrOS_semWait(empty_sem);
         //TODO: manage error
 
         // write the item and update write_index accordingly
@@ -57,10 +57,10 @@ void* producerJob(void* arg) {
 void* consumerJob(void* arg) {
     int ret = disastrOS_openSemaphore(consumers_sem, CONSUMERS_SEM_ID);
     while (1) {
-        int ret = disastrOS_semWait(&fill_sem);
+        int ret = disastrOS_semWait(fill_sem);
         //TODO: manage error
 
-        ret = disastrOS_semWait(&producers_sem);
+        ret = disastrOS_semWait(producers_sem);
         //TODO: manage error
 
         // get the item and update read_index accordingly

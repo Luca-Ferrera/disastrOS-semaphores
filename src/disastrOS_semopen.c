@@ -9,14 +9,15 @@
 void internal_semOpen(){
   // (1) get from PCB the ID and optional count of the semaphore to be opened
   int sem_id = running->syscall_args[0];
-  int oflag = running->syscall_args[1];
-  int count = running->syscall_args[2];
+  int oflag  = running->syscall_args[1];
+  int count  = running->syscall_args[2];
   printf("[*] PID %d requested open of semaphore %d\n", running->pid, sem_id);
 
   // (2) Check if a semaphore with the requested ID is already opened
   Semaphore* sem = SemaphoreList_byId(&semaphores_list, sem_id);
   if (oflag & DSOS_CREATE) {
-    if (!sem) {
+    if (sem) {
+      printf("[!] Semaphore with id %d already exists, returning DSOS_ESEMAPHORECREATE\n", sem_id);
       running->syscall_retvalue = DSOS_ESEMAPHORECREATE;
       return;
     }
@@ -45,15 +46,16 @@ void internal_semOpen(){
      running->syscall_retvalue=DSOS_ERESOURCENOFD;
      return;
   }
-  ++(running->last_sem_fd); // increment last fd number
-  SemDescriptorPtr* desc_ptr = SemDescriptorPtr_alloc(desc);
-  List_insert(&running->sem_descriptors, running->sem_descriptors.last, (ListItem*) desc_ptr);
-
+  running->last_sem_fd++; // increment last sem_fd number
+  List_insert(&running->sem_descriptors, running->sem_descriptors.last, (ListItem*) desc);
 
   // (6) Append the SemDescriptorPtr in the list
+  SemDescriptorPtr* desc_ptr = SemDescriptorPtr_alloc(desc);
   desc->ptr = desc_ptr;
   List_insert(&sem->descriptors, sem->descriptors.last, (ListItem*) desc_ptr);
 
   // return the created SemdDescriptor to the process
+  printf("[*] End of semOpen with id %d for process %d and flags %d\n", sem_id, running->pid, oflag);
+  SemaphoreList_print(&semaphores_list);
   running->syscall_retvalue = desc->fd;
 }

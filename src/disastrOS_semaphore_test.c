@@ -36,6 +36,8 @@ void sleeperFunction(void* args){
 /** Producer **/
 // TODO: Why does the func return a void* ?
 void* producerJob(void* arg) {
+    int ret = disastrOS_openSemaphore(PRODUCERS_SEM_ID, 0);
+    return;
     while (1) {
         // produce the item
         int currentTransaction = 1;
@@ -55,7 +57,8 @@ void* producerJob(void* arg) {
 /** Consumer **/
 // TODO: Why does the func return a void* ?
 void* consumerJob(void* arg) {
-    int ret = disastrOS_openSemaphore(consumers_sem, CONSUMERS_SEM_ID);
+    int ret = disastrOS_openSemaphore(CONSUMERS_SEM_ID, 0);
+    return;
     while (1) {
         int ret = disastrOS_semWait(fill_sem);
         //TODO: manage error
@@ -85,10 +88,10 @@ void childFunction(void* args){
   printf("Hello, I am the child function %d\n",disastrOS_getpid());
   printf("I will iterate a bit, before terminating\n");
 
-  // if (((int*) args)[0] == PRODUCERS_SEM_ID)
-  //   producerJob(PRODUCERS_SEM_ID);
-  // else if (((int*) args)[0] == CONSUMERS_SEM_ID)
-  //   consumerJob(CONSUMERS_SEM_ID);
+  if (((int*) args)[0] == PRODUCERS_SEM_ID)
+    producerJob(PRODUCERS_SEM_ID);
+  else if (((int*) args)[0] == CONSUMERS_SEM_ID)
+    consumerJob(CONSUMERS_SEM_ID);
 
   disastrOS_exit(disastrOS_getpid()+1);
 }

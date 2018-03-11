@@ -17,7 +17,6 @@ void internal_semOpen(){
   Semaphore* sem = SemaphoreList_byId(&semaphores_list, sem_id);
   if (oflag & DSOS_CREATE) {
     if (sem) {
-      printf("[!] Semaphore with id %d already exists, returning DSOS_ESEMAPHORECREATE\n", sem_id);
       running->syscall_retvalue = DSOS_ESEMAPHORECREATE;
       return;
     }
@@ -55,7 +54,7 @@ void internal_semOpen(){
   List_insert(&sem->descriptors, sem->descriptors.last, (ListItem*) desc_ptr);
 
   // return the created SemdDescriptor to the process
-  printf("[*] End of semOpen with id %d for process %d and flags %d\n", sem_id, running->pid, oflag);
-  SemaphoreList_print(&semaphores_list);
+  // printf("[*] End of semOpen with id %d for process %d and flags %d\n", sem_id, running->pid, oflag);
+  // SemaphoreList_print(&semaphores_list);
   running->syscall_retvalue = desc->fd;
 }

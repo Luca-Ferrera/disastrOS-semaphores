@@ -139,6 +139,12 @@ void initFunction(void* args) {
 	   pid, retval, alive_children);
     --alive_children;
   }
+
+  disastrOS_closeSemaphore(EMPTY_SEM_ID);
+  disastrOS_closeSemaphore(FILL_SEM_ID);
+  disastrOS_closeSemaphore(PRODUCERS_SEM_ID);
+  disastrOS_closeSemaphore(CONSUMERS_SEM_ID);
+
   printf("shutdown!");
   disastrOS_shutdown();
 }

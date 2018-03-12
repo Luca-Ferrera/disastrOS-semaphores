@@ -17,8 +17,7 @@ void internal_semWait(){
   if(sem->count < 0){
     //put running process into waiting_list
     List_insert(&waiting_list, waiting_list.last, (ListItem*)running);
-    //scheduling next process
-    disastrOS_preempt();
+  
   }
   running->syscall_retvalue=0;
 }

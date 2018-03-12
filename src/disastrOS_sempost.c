@@ -20,6 +20,8 @@ void internal_semPost(){
     //and wake it up
     ListItem* desc = List_detach(&sem->waiting_descriptors, sem->waiting_descriptors.first);
     List_insert(&waiting_list, waiting_list.last, (ListItem*)(desc));
+    //scheduling next process
+    disastrOS_preempt();
   }
   running->syscall_retvalue=0;
 }

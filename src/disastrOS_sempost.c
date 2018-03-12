@@ -16,7 +16,7 @@ void internal_semPost(){
   sem->count+=1;
   if(sem->count <= 0){
     
-    //Get process from those waiting on this semaphore
+    //Get descriptor from those waiting on this semaphore
     //and wake it up
     ListItem* desc = List_detach(&sem->waiting_descriptors, sem->waiting_descriptors.first);
     List_insert(&waiting_list, waiting_list.last, (ListItem*)(desc));

@@ -35,7 +35,7 @@ void sleeperFunction(void* args){
 
 /** Producer **/
 // TODO: Why does the func return a void* ?
-void* producerJob(void* arg) {
+void producerJob(void* arg) {
     int ret = disastrOS_openSemaphore(PRODUCERS_SEM_ID, 0);
     return;
     while (1) {
@@ -49,14 +49,14 @@ void* producerJob(void* arg) {
         transactions[write_index] = currentTransaction;
         write_index = (write_index + 1) % BUFFER_SIZE;
 
-        //ret = disastrOS_semPost(&fill_sem)
+        ret = disastrOS_semPost(&fill_sem);
         //TODO: manage error
     }
 }
 
 /** Consumer **/
 // TODO: Why does the func return a void* ?
-void* consumerJob(void* arg) {
+void consumerJob(void* arg) {
     int ret = disastrOS_openSemaphore(CONSUMERS_SEM_ID, 0);
     return;
     while (1) {
@@ -70,10 +70,10 @@ void* consumerJob(void* arg) {
         int lastTransaction = transactions[read_index];
         read_index = (read_index + 1) % BUFFER_SIZE;
 
-        //ret = disastroOS_semPost(&stop_producer);
+        ret = disastroOS_semPost(&producers_sem);
         //TODO: manage error
 
-        //ret = disastrOS_semPost(&empty_sem);
+        ret = disastrOS_semPost(&empty_sem);
         //TODO: manage error
 
         // consume the item
@@ -153,7 +153,7 @@ int main(int argc, char** argv){
   // we create the init process processes
   // the first is in the running variable
   // the others are in the ready queue
-  printf("the function pointer is: %p", childFunction);
+  printf("the function pointer is: %p\n", childFunction);
   // spawn an init process
   printf("start\n");
   disastrOS_start(initFunction, 0, logfilename);

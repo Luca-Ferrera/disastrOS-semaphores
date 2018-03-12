@@ -1,4 +1,5 @@
 #pragma once
+#define _XOPEN_SOURCE 600
 #include <ucontext.h> // this is the cpu status
 #include "disastrOS_constants.h"
 #include "linked_list.h"

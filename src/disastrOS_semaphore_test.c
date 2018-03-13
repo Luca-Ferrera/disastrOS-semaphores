@@ -8,8 +8,8 @@
 #define ERROR_HANDLER(ret, msg) \
   do {\
     if (ret < 0) { \
-      fprintf(stderr, "[!] %s", msg); \
-      exit(1); \
+      fprintf(stderr, "[!] %s\n", msg); \
+      disastrOS_exit(1); \
     }\
   } while(0);
 
@@ -35,6 +35,7 @@ int deposit;
 void producerJob(void* arg) {
   printf("I'm a fucking prod\n");
     int ret = disastrOS_openSemaphore(PRODUCERS_SEM_ID, 0);
+    ERROR_HANDLER(ret, "Error opening producers_sem in producerJob");
     while (1) {
         // produce the item
         int currentTransaction = 1;
@@ -58,6 +59,7 @@ void producerJob(void* arg) {
 // TODO: Why does the func return a void* ?
 void consumerJob(void* arg) {
     int ret = disastrOS_openSemaphore(CONSUMERS_SEM_ID, 0);
+    ERROR_HANDLER(ret, "Error opening consumers_sem in consumerJob");
     while (1) {
         int ret = disastrOS_semWait(fill_sem);
         //TODO: manage error
@@ -101,16 +103,20 @@ void initFunction(void* args) {
   disastrOS_printStatus();
   printf("hello, I am init and I just started\n");
   
-  int i, ret;
   // Creating empty and fill semaphores
   empty_sem = disastrOS_openSemaphore(EMPTY_SEM_ID, DSOS_CREATE | DSOS_EXCL ,BUFFER_SIZE);
-  // Reopening the same just for testing purposes
-  empty_sem = disastrOS_openSemaphore(EMPTY_SEM_ID, DSOS_CREATE);
+  ERROR_HANDLER(empty_sem, "Error opening empty_sem");
+  // Reopening the same sempahore just for error testing purposes
+  // empty_sem = disastrOS_openSemaphore(EMPTY_SEM_ID, DSOS_CREATE);
+  // ERROR_HANDLER(empty_sem, "Error opening empty_sem");
   fill_sem = disastrOS_openSemaphore(FILL_SEM_ID, DSOS_CREATE | DSOS_EXCL, 0);
+  ERROR_HANDLER(empty_sem, "Error opening fill_sem");
  
   // Creating producers/consumers mutex semaphores
   producers_sem = disastrOS_openSemaphore(PRODUCERS_SEM_ID, DSOS_CREATE | DSOS_EXCL, 1);
+  ERROR_HANDLER(empty_sem, "Error opening producers_sem");
   consumers_sem = disastrOS_openSemaphore(CONSUMERS_SEM_ID, DSOS_CREATE | DSOS_EXCL, 1);
+  ERROR_HANDLER(empty_sem, "Error opening consumers_sem");
 
   printf("[*] Created semaphores\n");
   disastrOS_printStatus();
@@ -140,9 +146,9 @@ void initFunction(void* args) {
 
   printf("[-] Removing semaphores\n");
   disastrOS_closeSemaphore(empty_sem);
-  disastrOS_closeSemaphore(FILL_SEM_ID);
-  disastrOS_closeSemaphore(PRODUCERS_SEM_ID);
-  disastrOS_closeSemaphore(CONSUMERS_SEM_ID);
+  disastrOS_closeSemaphore(fill_sem);
+  disastrOS_closeSemaphore(producers_sem);
+  disastrOS_closeSemaphore(consumers_sem);
   disastrOS_printStatus();
 
   printf("Shutdown!\n");

@@ -8,13 +8,14 @@
 
 void internal_semClose(){
   //1 retrieve the sem of the resource to close
-  int sem_id = running->syscall_args[0];
+  int sem_fd = running->syscall_args[0];
 
-  SemDescriptor* semDesc =  SemDescriptorList_byFd(&running->sem_descriptors, sem_id);
+  SemDescriptor* semDesc =  SemDescriptorList_byFd(&running->sem_descriptors, sem_fd);
   
   //2 if the sem is not in the the process, return an error
-  if(!semDesc){
-    running->syscall_retvalue=DSOS_ERESOURCECLOSE;
+  if(semDesc == 0){
+    printf("[!] Semaphore not in process\n");
+    running->syscall_retvalue=DSOS_ESEMAPHORECLOSE;
     return;
   }
 
@@ -27,6 +28,14 @@ void internal_semClose(){
   // we remove the descriptor pointer from the resource list
   SemDescriptorPtr* semDesPtr=(SemDescriptorPtr*) List_detach(&(sem->descriptors),(ListItem*)(semDesc->ptr));
   assert(semDesPtr);
+  
+  printf("Remaning descriptors %d for sem %d\n", sem->descriptors.size, sem->id);
+
+  if(sem->descriptors.size == 0){
+    printf("[-] Removing sem %d\n",sem->id);
+    List_detach(&semaphores_list, (ListItem*)sem);
+  }
+
   SemDescriptor_free(semDesc);
   SemDescriptorPtr_free(semDesPtr);
   running->syscall_retvalue=0;

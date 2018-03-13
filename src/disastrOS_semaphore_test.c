@@ -5,6 +5,14 @@
 #include "disastrOS.h"
 #include "disastrOS_semaphore.h"
 
+#define ERROR_HANDLER(ret, msg) \
+  do {\
+    if (ret < 0) { \
+      fprintf(stderr, "[!] %s", msg); \
+      exit(1); \
+    }\
+  } while(0);
+
 #define PRODUCERS_NUM 1
 #define CONSUMERS_NUM 1
 #define EMPTY_SEM_ID 0
@@ -21,17 +29,6 @@ int fill_sem;
 int consumers_sem;
 int producers_sem;
 int deposit;
-
-//TODO: should we declare semaphores globaly?
-
-// we need this to handle the sleep state
-void sleeperFunction(void* args){
-  printf("Hello, I am the sleeper, and I sleep %d\n",disastrOS_getpid());
-  while(1) {
-    getc(stdin);
-    disastrOS_printStatus();
-  }
-}
 
 /** Producer **/
 // TODO: Why does the func return a void* ?

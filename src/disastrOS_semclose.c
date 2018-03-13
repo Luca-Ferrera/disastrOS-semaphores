@@ -33,7 +33,7 @@ void internal_semClose(){
 
   if(sem->descriptors.size == 0){
     printf("[-] Removing sem %d\n",sem->id);
-    List_detach(&semaphores_list, sem);
+    List_detach(&semaphores_list, (ListItem*)sem);
   }
 
   SemDescriptor_free(semDesc);

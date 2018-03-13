@@ -36,14 +36,17 @@ void sleeperFunction(void* args){
 /** Producer **/
 // TODO: Why does the func return a void* ?
 void producerJob(void* arg) {
+  printf("I'm a fucking prod\n");
     int ret = disastrOS_openSemaphore(PRODUCERS_SEM_ID, 0);
-    return;
     while (1) {
         // produce the item
         int currentTransaction = 1;
 
+        printf("[*] Waiting on %d\n", EMPTY_SEM_ID);
         int ret = disastrOS_semWait(empty_sem);
         //TODO: manage error
+        disastrOS_printStatus();
+        return;
 
         // write the item and update write_index accordingly
         transactions[write_index] = currentTransaction;
@@ -58,13 +61,13 @@ void producerJob(void* arg) {
 // TODO: Why does the func return a void* ?
 void consumerJob(void* arg) {
     int ret = disastrOS_openSemaphore(CONSUMERS_SEM_ID, 0);
-    return;
     while (1) {
         int ret = disastrOS_semWait(fill_sem);
         //TODO: manage error
 
         ret = disastrOS_semWait(producers_sem);
         //TODO: manage error
+        return;
 
         // get the item and update read_index accordingly
         int lastTransaction = transactions[read_index];
@@ -100,7 +103,6 @@ void childFunction(void* args){
 void initFunction(void* args) {
   disastrOS_printStatus();
   printf("hello, I am init and I just started\n");
-  disastrOS_spawn(sleeperFunction, 0);
   
   int i, ret;
   // Creating empty and fill semaphores
@@ -113,9 +115,8 @@ void initFunction(void* args) {
   producers_sem = disastrOS_openSemaphore(PRODUCERS_SEM_ID, DSOS_CREATE | DSOS_EXCL, 1);
   consumers_sem = disastrOS_openSemaphore(CONSUMERS_SEM_ID, DSOS_CREATE | DSOS_EXCL, 1);
 
+  printf("[*] Created semaphores\n");
   disastrOS_printStatus();
-  printf("Shutdown!\n");
-  disastrOS_shutdown();
 
   printf("[+] Creating %d producers and %d consumers\n", PRODUCERS_NUM, CONSUMERS_NUM);
 
@@ -125,10 +126,10 @@ void initFunction(void* args) {
     disastrOS_spawn(childFunction, &job_type);
     alive_children++;
   }
-  for (int i = 0, job_type = CONSUMERS_SEM_ID; i<CONSUMERS_NUM; ++i) {
-    disastrOS_spawn(childFunction, &job_type);
-    alive_children++;
-  }
+  // for (int i = 0, job_type = CONSUMERS_SEM_ID; i<CONSUMERS_NUM; ++i) {
+  //   disastrOS_spawn(childFunction, &job_type);
+  //   alive_children++;
+  // }
 
   disastrOS_printStatus();
   int retval;
@@ -140,12 +141,14 @@ void initFunction(void* args) {
     --alive_children;
   }
 
-  disastrOS_closeSemaphore(EMPTY_SEM_ID);
+  printf("[-] Removing semaphores\n");
+  disastrOS_closeSemaphore(empty_sem);
   disastrOS_closeSemaphore(FILL_SEM_ID);
   disastrOS_closeSemaphore(PRODUCERS_SEM_ID);
   disastrOS_closeSemaphore(CONSUMERS_SEM_ID);
+  disastrOS_printStatus();
 
-  printf("shutdown!");
+  printf("Shutdown!\n");
   disastrOS_shutdown();
 }
 

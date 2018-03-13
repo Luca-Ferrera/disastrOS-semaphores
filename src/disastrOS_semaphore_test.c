@@ -35,6 +35,7 @@ int deposit;
 void producerJob(void* arg) {
   printf("I'm a fucking prod\n");
     int ret = disastrOS_openSemaphore(PRODUCERS_SEM_ID, 0);
+    ERROR_HANDLER(ret, "Error opening producers_sem in producerJob");
     while (1) {
         // produce the item
         int currentTransaction = 1;
@@ -58,6 +59,7 @@ void producerJob(void* arg) {
 // TODO: Why does the func return a void* ?
 void consumerJob(void* arg) {
     int ret = disastrOS_openSemaphore(CONSUMERS_SEM_ID, 0);
+    ERROR_HANDLER(ret, "Error opening consumers_sem in consumerJob");
     while (1) {
         int ret = disastrOS_semWait(fill_sem);
         //TODO: manage error
@@ -101,7 +103,6 @@ void initFunction(void* args) {
   disastrOS_printStatus();
   printf("hello, I am init and I just started\n");
   
-  int i, ret;
   // Creating empty and fill semaphores
   empty_sem = disastrOS_openSemaphore(EMPTY_SEM_ID, DSOS_CREATE | DSOS_EXCL ,BUFFER_SIZE);
   ERROR_HANDLER(empty_sem, "Error opening empty_sem");

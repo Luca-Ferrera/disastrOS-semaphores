@@ -10,7 +10,7 @@ void internal_semPost(){
   int sem_id = running->syscall_args[0];
   Semaphore* sem = SemaphoreList_byId(&semaphores_list, sem_id);
   if(!sem){
-    running->syscall_retvalue = DSOS_ERESEMAPHORE;
+    running->syscall_retvalue = DSOS_ESEMAPHOREWAIT;
     return;
   }
   sem->count+=1;

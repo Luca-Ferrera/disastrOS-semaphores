@@ -140,9 +140,9 @@ void initFunction(void* args) {
 
   printf("[-] Removing semaphores\n");
   disastrOS_closeSemaphore(empty_sem);
-  disastrOS_closeSemaphore(FILL_SEM_ID);
-  disastrOS_closeSemaphore(PRODUCERS_SEM_ID);
-  disastrOS_closeSemaphore(CONSUMERS_SEM_ID);
+  disastrOS_closeSemaphore(fill_sem);
+  disastrOS_closeSemaphore(producers_sem);
+  disastrOS_closeSemaphore(consumers_sem);
   disastrOS_printStatus();
 
   printf("Shutdown!\n");

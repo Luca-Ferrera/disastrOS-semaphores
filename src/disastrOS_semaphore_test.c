@@ -9,7 +9,7 @@
   do {\
     if (ret < 0) { \
       fprintf(stderr, "[!] %s\n", msg); \
-      exit(1); \
+      disastrOS_exit(1); \
     }\
   } while(0);
 
@@ -105,9 +105,9 @@ void initFunction(void* args) {
   // Creating empty and fill semaphores
   empty_sem = disastrOS_openSemaphore(EMPTY_SEM_ID, DSOS_CREATE | DSOS_EXCL ,BUFFER_SIZE);
   ERROR_HANDLER(empty_sem, "Error opening empty_sem");
-  // Reopening the same just for testing purposes
-  empty_sem = disastrOS_openSemaphore(EMPTY_SEM_ID, DSOS_CREATE);
-  ERROR_HANDLER(empty_sem, "Error opening empty_sem");
+  // Reopening the same sempahore just for error testing purposes
+  // empty_sem = disastrOS_openSemaphore(EMPTY_SEM_ID, DSOS_CREATE);
+  // ERROR_HANDLER(empty_sem, "Error opening empty_sem");
   fill_sem = disastrOS_openSemaphore(FILL_SEM_ID, DSOS_CREATE | DSOS_EXCL, 0);
   ERROR_HANDLER(empty_sem, "Error opening fill_sem");
  

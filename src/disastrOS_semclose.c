@@ -13,7 +13,7 @@ void internal_semClose(){
   SemDescriptor* semDesc =  SemDescriptorList_byFd(&running->sem_descriptors, sem_fd);
   
   //2 if the sem is not in the the process, return an error
-  if(semDesc == 0){
+  if(!semDesc){
     printf("[!] Semaphore not in process\n");
     running->syscall_retvalue=DSOS_ESEMAPHORECLOSE;
     return;

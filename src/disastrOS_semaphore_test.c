@@ -45,6 +45,10 @@ void producerJob(void* arg) {
         //TODO: manage error
         disastrOS_printStatus();
         return;
+        //Paliotts dichiara la semPost in disastrOS.c!!!!
+        ret = disastrOS_semPost(empty_sem);
+        disastrOS_printStatus();
+        return;
 
         // write the item and update write_index accordingly
         transactions[write_index] = currentTransaction;
@@ -89,11 +93,11 @@ void consumerJob(void* arg) {
 void childFunction(void* args){
   printf("Hello, I am the child function %d\n",disastrOS_getpid());
   printf("I will iterate a bit, before terminating\n");
-
-  if (((int*) args)[0] == PRODUCERS_SEM_ID)
+  disastrOS_printStatus();
+  //if (((int*) args)[0] == PRODUCERS_SEM_ID)
     producerJob(PRODUCERS_SEM_ID);
-  else if (((int*) args)[0] == CONSUMERS_SEM_ID)
-    consumerJob(CONSUMERS_SEM_ID);
+  //else if (((int*) args)[0] == CONSUMERS_SEM_ID)
+    //consumerJob(CONSUMERS_SEM_ID);
 
   disastrOS_exit(disastrOS_getpid()+1);
 }
@@ -102,16 +106,16 @@ void childFunction(void* args){
 void initFunction(void* args) {
   disastrOS_printStatus();
   printf("hello, I am init and I just started\n");
-  
+
   // Creating empty and fill semaphores
-  empty_sem = disastrOS_openSemaphore(EMPTY_SEM_ID, DSOS_CREATE | DSOS_EXCL ,BUFFER_SIZE);
+  empty_sem = disastrOS_openSemaphore(EMPTY_SEM_ID, DSOS_CREATE | DSOS_EXCL ,0);
   ERROR_HANDLER(empty_sem, "Error opening empty_sem");
   // Reopening the same sempahore just for error testing purposes
   // empty_sem = disastrOS_openSemaphore(EMPTY_SEM_ID, DSOS_CREATE);
   // ERROR_HANDLER(empty_sem, "Error opening empty_sem");
   fill_sem = disastrOS_openSemaphore(FILL_SEM_ID, DSOS_CREATE | DSOS_EXCL, 0);
   ERROR_HANDLER(empty_sem, "Error opening fill_sem");
- 
+
   // Creating producers/consumers mutex semaphores
   producers_sem = disastrOS_openSemaphore(PRODUCERS_SEM_ID, DSOS_CREATE | DSOS_EXCL, 1);
   ERROR_HANDLER(empty_sem, "Error opening producers_sem");
@@ -125,7 +129,9 @@ void initFunction(void* args) {
 
   int alive_children=0;
   int job_type;
-  for (int i = 0, job_type = PRODUCERS_SEM_ID; i<PRODUCERS_NUM; ++i) {
+  //disastrOS_spawn(childFunction, &job_type);
+
+  for (int i = 0, job_type = PRODUCERS_SEM_ID; i<1; ++i) {
     disastrOS_spawn(childFunction, &job_type);
     alive_children++;
   }
@@ -137,7 +143,7 @@ void initFunction(void* args) {
   disastrOS_printStatus();
   int retval;
   int pid;
-  while(alive_children>0 && (pid=disastrOS_wait(0, &retval))>=0){ 
+  while(alive_children>0 && (pid=disastrOS_wait(0, &retval))>=0){
     disastrOS_printStatus();
     printf("initFunction, child: %d terminated, retval:%d, alive: %d \n",
 	   pid, retval, alive_children);

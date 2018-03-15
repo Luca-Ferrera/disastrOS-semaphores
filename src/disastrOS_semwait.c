@@ -8,9 +8,9 @@
 
 void internal_semWait(){
   int sem_fd = running->syscall_args[0];
-  
+
   printf("Pid %d requesting semwait on %d semaphore\n", running->pid, sem_fd);
-  
+
   SemDescriptor* sem_desc = SemDescriptorList_byFd(&(running->sem_descriptors), sem_fd);
   printf("Sem_desc %d \n", sem_desc);
   if(!sem_desc){
@@ -26,16 +26,18 @@ void internal_semWait(){
     return;
   }*/
   Semaphore* sem = sem_desc->semaphore;
-  
+
   sem->count-=1;
-  //changed condition for testing purpose
+
   if(sem->count >= 0){
     //put running process into waiting_list
     List_insert(&waiting_list, waiting_list.last, (ListItem*)running);
+
     List_insert(&sem->waiting_descriptors,sem->waiting_descriptors.last,(ListItem*)running);
     //scheduling next process
     //disastrOS_printStatus();
     //disastrOS_preempt();
+    running->status = Waiting;
   }
   running->syscall_retvalue=0;
 }

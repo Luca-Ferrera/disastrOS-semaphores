@@ -32,7 +32,7 @@ void internal_semWait(){
   if(sem->count >= 0){
     //put running process into waiting_list
     List_insert(&waiting_list, waiting_list.last, (ListItem*)running);
-    List_insert(&sem->waiting_descriptors,sem->waiting_descriptors.last,(ListItem*)running);
+    List_insert(&(sem->waiting_descriptors),sem->waiting_descriptors.last,(ListItem*)running);
     //scheduling next process
     //disastrOS_printStatus();
     //disastrOS_preempt();

@@ -34,7 +34,7 @@ int deposit;
 // TODO: Why does the func return a void* ?
 void producerJob(void* arg) {
   printf("I'm a fucking prod\n");
-    int ret = disastrOS_openSemaphore(PRODUCERS_SEM_ID, 0);
+    int ret = disastrOS_openSemaphore(EMPTY_SEM_ID, 0);
     ERROR_HANDLER(ret, "Error opening producers_sem in producerJob");
     while (1) {
         // produce the item

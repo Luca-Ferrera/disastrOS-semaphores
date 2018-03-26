@@ -65,5 +65,8 @@ disastrOS_test:		disastrOS_test.c $(LIBS)
 disastrOS_semaphore_test:		disastrOS_semaphore_test.c $(LIBS)
 	$(CC) $(CCOPTS) -o $@ $^
 
+test:	disastrOS_semaphore_test
+	./disastrOS_semaphore_test
+
 clean:
 	rm -rf *.o *~ $(LIBS) $(BINS)

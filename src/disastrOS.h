@@ -42,6 +42,7 @@ ListHead semaphores_list; // global list of semaphores
 
 int disastrOS_openSemaphore(const int sem_id, const int oflag, ...);
 int disastrOS_semWait(int sem_id);
+int disastrOS_closeSemaphore(int sem_id);
 
 // debug function, prints the state of the internal system
 void disastrOS_printStatus();

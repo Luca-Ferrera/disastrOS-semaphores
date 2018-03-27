@@ -65,9 +65,10 @@ void consumerJob(void* arg) {
     int ret = disastrOS_openSemaphore(CONSUMERS_SEM_ID, 0);
     ERROR_HANDLER(ret, "Error opening consumers_sem in consumerJob");
     while (1) {
-        int ret = disastrOS_semWait(fill_sem);
+        int ret = disastrOS_semPost(empty_sem);
+        return;
         //TODO: manage error
-
+        
         ret = disastrOS_semWait(producers_sem);
         //TODO: manage error
         return;
@@ -94,10 +95,14 @@ void childFunction(void* args){
   printf("Hello, I am the child function %d\n",disastrOS_getpid());
   printf("I will iterate a bit, before terminating\n");
   disastrOS_printStatus();
-  //if (((int*) args)[0] == PRODUCERS_SEM_ID)
+  //USE THIS TO TEST SEM_POST
+  /*if (((int*) args)[0] == PRODUCERS_SEM_ID)
     producerJob(PRODUCERS_SEM_ID);
-  //else if (((int*) args)[0] == CONSUMERS_SEM_ID)
-    //consumerJob(CONSUMERS_SEM_ID);
+  else if (((int*) args)[0] == CONSUMERS_SEM_ID)
+    consumerJob(CONSUMERS_SEM_ID);*/ 
+
+  //USE THIS UNTIL SEM_POST IS NOT IMPLEMENTED
+  producerJob(PRODUCERS_SEM_ID);
 
   disastrOS_exit(disastrOS_getpid()+1);
 }
@@ -135,10 +140,11 @@ void initFunction(void* args) {
     disastrOS_spawn(childFunction, &job_type);
     alive_children++;
   }
-  // for (int i = 0, job_type = CONSUMERS_SEM_ID; i<CONSUMERS_NUM; ++i) {
-  //   disastrOS_spawn(childFunction, &job_type);
-  //   alive_children++;
-  // }
+  //USE THIS TO TEST SEM_POST
+  /*for (int i = 0, job_type = CONSUMERS_SEM_ID; i<1; ++i) {
+     disastrOS_spawn(childFunction, &job_type);
+     alive_children++;
+  }*/
 
   disastrOS_printStatus();
   int retval;

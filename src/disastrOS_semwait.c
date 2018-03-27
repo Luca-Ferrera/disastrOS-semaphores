@@ -24,22 +24,26 @@ void internal_semWait(){
   sem->count-=1;
   if(sem->count <= 0){
     //put running process into waiting_list
-    printf("Semaphore id: %x\n",sem->id);
-    printf("Semaphore waiting list: %x\n",sem->waiting_descriptors);
-    printf("Semaphore waiting list last: %x\n",sem->waiting_descriptors.last);
-    printf("running process: %x\n",running->pid);
-    printf("running next: %x\n",((ListItem*)running)->next);
-    printf("running prev: %x\n",((ListItem*)running)->prev); 
+    //printf("Semaphore id: %x\n",sem->id);
+    //printf("Semaphore waiting list: %x\n",sem->waiting_descriptors);
+    //printf("Semaphore waiting list last: %x\n",sem->waiting_descriptors.last);
+    //printf("running process: %x\n",running->pid);
+    //printf("running next: %x\n",((ListItem*)running)->next);
+    //printf("running prev: %x\n",((ListItem*)running)->prev); 
     
       
-    ListItem* l = List_find(&running->sem_descriptors, (ListItem*) sem_desc);
-    
-    printf("running sem_desc_last: %x\n",l);   
-    List_insert(&(sem->waiting_descriptors), sem->waiting_descriptors.last, l);
-    //running->status = Waiting;
+    //SemDescriptor* l = List_find(&running->sem_descriptors, (ListItem*) sem_desc);
+    SemDescriptorPtr* sem_desc_ptr = SemDescriptorPtr_alloc(sem_desc);  
+    List_insert(&(sem->waiting_descriptors), sem->waiting_descriptors.last, (ListItem*) sem_desc_ptr);
+    running->status = Waiting;
     List_insert(&waiting_list, waiting_list.last, (ListItem*)running);
-
-    //running = (PCB*) List_detach(&ready_list,(ListItem*)ready_list.last);
+    PCBList_print(&ready_list);
+    //while(!ready_list.size);
+    if(!ready_list.size){
+      printf("Deadlock detected -> Shutdown!\n");
+      disastrOS_shutdown();
+    }
+    running = (PCB*) List_detach(&ready_list,(ListItem*)ready_list.first);
     //scheduling next process
     //disastrOS_printStatus();
     //disastrOS_preempt();

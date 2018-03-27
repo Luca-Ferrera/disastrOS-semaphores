@@ -65,7 +65,7 @@ void consumerJob(void* arg) {
     int ret = disastrOS_openSemaphore(CONSUMERS_SEM_ID, 0);
     ERROR_HANDLER(ret, "Error opening consumers_sem in consumerJob");
     while (1) {
-        int ret = disastrOS_semPost(empty_sem);
+        //int ret = disastrOS_semPost(empty_sem);
         return;
         //TODO: manage error
         

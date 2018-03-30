@@ -43,7 +43,7 @@ OBJS=pool_allocator.o\
 
 LIBS=libdisastrOS.a
 
-BINS=disastrOS_test disastrOS_semaphore_test
+BINS=disastrOS_test disastrOS_semaphore_test disastrOS_semaphore_test2
 
 #disastros_test
 
@@ -63,6 +63,9 @@ disastrOS_test:		disastrOS_test.c $(LIBS)
 	$(CC) $(CCOPTS) -o $@ $^
 
 disastrOS_semaphore_test:		disastrOS_semaphore_test.c $(LIBS)
+	$(CC) $(CCOPTS) -o $@ $^
+
+disastrOS_semaphore_test2:		disastrOS_semaphore_test2.c $(LIBS)
 	$(CC) $(CCOPTS) -o $@ $^
 
 test:	disastrOS_semaphore_test

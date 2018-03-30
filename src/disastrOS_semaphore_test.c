@@ -68,8 +68,11 @@ void producerJob(int producer_no) {
       //TODO: manage error
 
     i++;
-    disastrOS_sleep(1);
+    // disastrOS_sleep(1);
   }
+  
+  disastrOS_closeSemaphore(empty_sem);
+  disastrOS_closeSemaphore(producers_sem);
 }
 
 /** Consumer **/
@@ -103,8 +106,11 @@ void consumerJob(int consumer_no) {
           printf("After the last 10 transactions balance is now %d.\n", deposit);
       }
       i++;
-    disastrOS_sleep(1);
+    // disastrOS_sleep(1);
   }
+  
+  disastrOS_closeSemaphore(fill_sem);
+  disastrOS_closeSemaphore(consumers_sem);
 }
 
 void childFunction(void* args){

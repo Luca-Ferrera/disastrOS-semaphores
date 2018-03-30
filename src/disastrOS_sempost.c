@@ -12,16 +12,16 @@ void internal_semPost(){
   int fd = running->syscall_args[0];
 
   // Get Semaphore Descriptor from file descriptor  
-  SemDescriptor* sem_id = SemDescriptorList_byFd(&running->sem_descriptors, fd);
+  SemDescriptor* sem_desc = SemDescriptorList_byFd(&running->sem_descriptors, fd);
 
-  // Finally, get semaphore from SemDescriptor
+  /*// Finally, get semaphore from SemDescriptor
   Semaphore* sem = SemaphoreList_byId(&semaphores_list, sem_id);
   if(!sem){
     running->syscall_retvalue = DSOS_ESEMAPHOREPOST;
     return;
-  }
+  }*/
 
-  Semaphore* sem = sem_des->semaphore;
+  Semaphore* sem = sem_desc->semaphore;
   sem->count++;
 
   if(sem->count <= 0){

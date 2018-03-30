@@ -7,21 +7,50 @@
 #include "disastrOS_semdescriptor.h"
 
 void internal_semPost(){
-  int sem_id = running->syscall_args[0];
+
+  // The argument is the file descriptor of the semaphore
+  int fd = running->syscall_args[0];
+
+  // Get Semaphore Descriptor from file descriptor  
+  SemDescriptor* sem_id = SemDescriptorList_byFd(&running->sem_descriptors, fd);
+
+  // Finally, get semaphore from SemDescriptor
   Semaphore* sem = SemaphoreList_byId(&semaphores_list, sem_id);
   if(!sem){
     running->syscall_retvalue = DSOS_ESEMAPHOREPOST;
     return;
   }
-  sem->count+=1;
+
+  Semaphore* sem = sem_des->semaphore;
+  sem->count++;
+
   if(sem->count <= 0){
 
     //Get descriptor from those waiting on this semaphore
     //and wake it up
-    ListItem* desc = List_detach(&sem->waiting_descriptors, sem->waiting_descriptors.first);
-    List_insert(&waiting_list, waiting_list.last, (ListItem*)(desc));
-    //scheduling next process
-    disastrOS_preempt();
+    SemDescriptorPtr* sem_desc_ptr = (SemDescriptorPtr*)List_detach(&sem->waiting_descriptors, sem->waiting_descriptors.first);
+
+    if(!sem_desc_ptr){
+            // No semaphores in waiting list
+            running->syscall_retvalue = DSOS_ERESOURCEOPEN;
+            return;
+    }
+
+    SemDescriptor* sem_desc = sem_desc_ptr->descriptor;
+    PCB* ready_process = sem_desc->pcb;
+
+    PCB* ret = (PCB*)List_detach(&waiting_list, (ListItem*)ready_process);
+    if(!ret){
+        // The process is not in waiting list
+        running->syscall_retvalue = DSOS_ERESOURCEOPEN;
+        return;
+    }
+    
+    // Set state of ready process
+    ready_process->status = Ready;
+    
+    //Insert process in ready list
+    List_insert(&ready_list, ready_list.last, (ListItem*)ready_process);
   }
   running->syscall_retvalue=0;
 }

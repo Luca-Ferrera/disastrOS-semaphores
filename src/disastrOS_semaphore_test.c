@@ -116,7 +116,7 @@ void initFunction(void* args) {
 
   printf("[+]@Init Creating semaphores ... \n");
   // Creating empty and fill semaphores
-  empty_sem = disastrOS_openSemaphore(EMPTY_SEM_ID, DSOS_CREATE | DSOS_EXCL ,0);
+  empty_sem = disastrOS_openSemaphore(EMPTY_SEM_ID, DSOS_CREATE | DSOS_EXCL, BUFFER_SIZE);
   ERROR_HANDLER(empty_sem, "Error opening empty_sem");
   // Reopening the same sempahore just for error testing purposes
   // empty_sem = disastrOS_openSemaphore(EMPTY_SEM_ID, DSOS_CREATE);

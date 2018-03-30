@@ -11,6 +11,8 @@ void internal_semPost(){
   // The argument is the file descriptor of the semaphore
   int fd = running->syscall_args[0];
 
+  printf("Pid %d requesting sempost on %d semaphore\n", running->pid, fd);
+
   // Get Semaphore Descriptor from file descriptor  
   SemDescriptor* sem_desc = SemDescriptorList_byFd(&running->sem_descriptors, fd);
 
@@ -31,7 +33,6 @@ void internal_semPost(){
     SemDescriptorPtr* sem_desc_ptr = (SemDescriptorPtr*)List_detach(&sem->waiting_descriptors, sem->waiting_descriptors.first);
 
     if(!sem_desc_ptr){
-            // No semaphores in waiting list
             running->syscall_retvalue = DSOS_ERESOURCEOPEN;
             return;
     }
@@ -41,10 +42,12 @@ void internal_semPost(){
 
     PCB* ret = (PCB*)List_detach(&waiting_list, (ListItem*)ready_process);
     if(!ret){
-        // The process is not in waiting list
+        printf("[!] Process with Pid %d is not in waiting list\n", ready_process->pid);
         running->syscall_retvalue = DSOS_ERESOURCEOPEN;
         return;
     }
+
+    printf("Adding process with Pid %d to ready list\n", ready_process->pid);
     
     // Set state of ready process
     ready_process->status = Ready;

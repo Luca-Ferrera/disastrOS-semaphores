@@ -64,6 +64,8 @@ void producerJob(int producer_no) {
       
       ret = disastrOS_semPost(fill_sem);
       //TODO: manage error
+
+    disastrOS_sleep(1);
   }
 }
 
@@ -96,6 +98,7 @@ void consumerJob(int consumer_no) {
       if (read_index % 10 == 0) {
           printf("After the last 10 transactions balance is now %d.\n", deposit);
       }
+    disastrOS_sleep(1);
   }
 }
 

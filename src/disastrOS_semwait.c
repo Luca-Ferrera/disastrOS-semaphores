@@ -20,9 +20,9 @@ void internal_semWait(){
   Semaphore* sem = sem_desc->semaphore;
 
   sem->count-=1;
-  if(sem->count <= 0){ 
+  if(sem->count < 0){ 
     SemDescriptorPtr* sem_desc_ptr = SemDescriptorPtr_alloc(sem_desc);  
-    List_insert(&(sem->waiting_descriptors), sem->waiting_descriptors.last, (ListItem*) sem_desc_ptr);
+    List_insert(&(sem->waiting_descriptors), sem->waiting_descriptors.last, (ListItem*)sem_desc->pcb);
     running->status = Waiting;
     List_insert(&waiting_list, waiting_list.last, (ListItem*)running);
     // PCBList_print(&ready_list);

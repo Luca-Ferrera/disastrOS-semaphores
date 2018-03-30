@@ -13,8 +13,8 @@
     }\
   } while(0);
 
-#define READERS_NUM 1
-#define WRITERS_NUM 1
+#define READERS_NUM 5
+#define WRITERS_NUM 5
 #define WRITERS_SEM_ID 0
 #define MUTEX_SEM_ID 2
 #define BUFFER_SIZE 128
@@ -46,7 +46,7 @@ void writerJob(int writer_no) {
   int i = 0;
   while (i < 100) {
       // produce the item
-      int currentTransaction = 1;
+      int currentTransaction = writer_no;
 
       ret = disastrOS_semWait(write_sem);
       //TODO: manage error

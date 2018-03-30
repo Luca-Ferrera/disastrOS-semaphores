@@ -8,7 +8,7 @@
 #define ERROR_HANDLER(ret, msg) \
   do {\
     if (ret < 0) { \
-      fprintf(stderr, "[!] %s\n", msg); \
+      fprintf(stderr, "[!](%d) %s\n", ret, msg); \
       disastrOS_exit(1); \
     }\
   } while(0);

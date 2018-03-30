@@ -44,7 +44,8 @@ void producerJob(int producer_no) {
   ERROR_HANDLER(empty_sem, "Error opening empty_sem in producerJob");
   int producers_sem = disastrOS_openSemaphore(PRODUCERS_SEM_ID, 0);
   ERROR_HANDLER(producers_sem, "Error opening producers_sem in producerJob");
-  while (1) {
+  int i = 0;
+  while (i < 100) {
       // produce the item
       int currentTransaction = 1;
 
@@ -61,10 +62,12 @@ void producerJob(int producer_no) {
       ret = disastrOS_semPost(producers_sem);
       //TODO: manage error
       
+    i++;
       
       ret = disastrOS_semPost(fill_sem);
       //TODO: manage error
 
+    i++;
     disastrOS_sleep(1);
   }
 }
@@ -77,7 +80,8 @@ void consumerJob(int consumer_no) {
   ERROR_HANDLER(fill_sem, "Error opening fill_sem in consumerJob");
   int consumers_sem = disastrOS_openSemaphore(CONSUMERS_SEM_ID, 0);
   ERROR_HANDLER(consumers_sem, "Error opening consumers_sem in consumerJob");
-  while (1) {
+  int i = 0;
+  while (i < 100) {
       ret = disastrOS_semWait(fill_sem);
       //TODO: manage error
       
@@ -98,6 +102,7 @@ void consumerJob(int consumer_no) {
       if (read_index % 10 == 0) {
           printf("After the last 10 transactions balance is now %d.\n", deposit);
       }
+      i++;
     disastrOS_sleep(1);
   }
 }
@@ -105,10 +110,14 @@ void consumerJob(int consumer_no) {
 void childFunction(void* args){
   disastrOS_printStatus();
   Child_Args_t *child_args_t = (Child_Args_t*) args;
-  if (child_args_t->sem_id  == PRODUCERS_SEM_ID)
+  if (child_args_t->sem_id  == PRODUCERS_SEM_ID) {
     producerJob(child_args_t->number);
-  else if (child_args_t->sem_id == CONSUMERS_SEM_ID)
+    printf("[-]@Child Producer #%d finished working\n", child_args_t->number);
+  }
+  else if (child_args_t->sem_id == CONSUMERS_SEM_ID) {
     consumerJob(child_args_t->number);
+    printf("[-]@Child Consumer #%d finished working\n", child_args_t->number);
+  }
 
   disastrOS_exit(disastrOS_getpid()+1);
 }

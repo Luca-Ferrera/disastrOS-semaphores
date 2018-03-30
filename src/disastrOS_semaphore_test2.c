@@ -16,9 +16,11 @@
 #define READERS_NUM 1
 #define WRITERS_NUM 1
 #define WRITERS_SEM_ID 0
-#define READERS_SEM_ID 1
 #define MUTEX_SEM_ID 2
 #define BUFFER_SIZE 128
+
+#define READER_CHILD 0
+#define WRITER_CHILD 1
 
 typedef struct Child_Args_s {
   int sem_id;
@@ -106,11 +108,11 @@ void readerJob(int reader_no) {
 void childFunction(void* args){
   disastrOS_printStatus();
   Child_Args_t *child_args_t = (Child_Args_t*) args;
-  if (child_args_t->sem_id  == READERS_SEM_ID) {
+  if (child_args_t->sem_id  == READER_CHILD) {
     readerJob(child_args_t->number);
     printf("[-]@Child Reader #%d finished working\n", child_args_t->number);
   }
-  else if (child_args_t->sem_id == WRITERS_SEM_ID) {
+  else if (child_args_t->sem_id == WRITER_CHILD) {
     writerJob(child_args_t->number);
     printf("[-]@Child Writer #%d finished working\n", child_args_t->number);
   }
@@ -140,13 +142,13 @@ void initFunction(void* args) {
   Child_Args_t readers_args[READERS_NUM];
 
   for (int i = 0; i<WRITERS_NUM; ++i) {
-    writers_args[i].sem_id = WRITERS_SEM_ID;
+    writers_args[i].sem_id = WRITER_CHILD;
     writers_args[i].number = i;
     disastrOS_spawn(childFunction, &writers_args[i]);
     alive_children++;
   }
   for (int i = 0; i<READERS_NUM; ++i) {
-    readers_args[i].sem_id = READERS_SEM_ID;
+    readers_args[i].sem_id = READER_CHILD;
     readers_args[i].number = i;
     disastrOS_spawn(childFunction, &readers_args[i]);
      alive_children++;

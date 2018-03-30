@@ -39,10 +39,11 @@ int deposit;
 // TODO: Why does the func return a void* ?
 void producerJob(int producer_no) {
   printf("[*]@Producer #%d\n", producer_no);
-  int ret = disastrOS_openSemaphore(EMPTY_SEM_ID, 0);
-  ERROR_HANDLER(ret, "Error opening empty_sem in producerJob");
-  ret = disastrOS_openSemaphore(PRODUCERS_SEM_ID, 0);
-  ERROR_HANDLER(ret, "Error opening producers_sem in producerJob");
+  int ret;
+  int empty_sem = disastrOS_openSemaphore(EMPTY_SEM_ID, 0);
+  ERROR_HANDLER(empty_sem, "Error opening empty_sem in producerJob");
+  int producers_sem = disastrOS_openSemaphore(PRODUCERS_SEM_ID, 0);
+  ERROR_HANDLER(producers_sem, "Error opening producers_sem in producerJob");
   while (1) {
       // produce the item
       int currentTransaction = 1;
@@ -60,6 +61,7 @@ void producerJob(int producer_no) {
       ret = disastrOS_semPost(producers_sem);
       //TODO: manage error
       
+      
       ret = disastrOS_semPost(fill_sem);
       //TODO: manage error
   }
@@ -68,10 +70,11 @@ void producerJob(int producer_no) {
 /** Consumer **/
 void consumerJob(int consumer_no) {
   printf("[*]@Consumer #%d\n", consumer_no);
-  int ret = disastrOS_openSemaphore(FILL_SEM_ID, 0);
-  ERROR_HANDLER(ret, "Error opening fill_sem in consumerJob");
-  ret = disastrOS_openSemaphore(CONSUMERS_SEM_ID, 0);
-  ERROR_HANDLER(ret, "Error opening consumers_sem in consumerJob");
+  int ret;
+  int fill_sem = disastrOS_openSemaphore(FILL_SEM_ID, 0);
+  ERROR_HANDLER(fill_sem, "Error opening fill_sem in consumerJob");
+  int consumers_sem = disastrOS_openSemaphore(CONSUMERS_SEM_ID, 0);
+  ERROR_HANDLER(consumers_sem, "Error opening consumers_sem in consumerJob");
   while (1) {
       ret = disastrOS_semWait(fill_sem);
       //TODO: manage error
@@ -152,7 +155,7 @@ void initFunction(void* args) {
   int retval;
   int pid;
   while(alive_children>0 && (pid=disastrOS_wait(0, &retval))>=0){
-    disastrOS_printStatus();
+    // disastrOS_printStatus();
     printf("[-]@Init child: %d terminated, retval:%d, alive: %d \n",
 	   pid, retval, alive_children);
     --alive_children;

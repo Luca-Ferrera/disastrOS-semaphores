@@ -15,7 +15,8 @@
 
 #define READERS_NUM 1
 #define WRITERS_NUM 1
-#define WRITE_SEM_ID 0
+#define WRITERS_SEM_ID 0
+#define READERS_SEM_ID 1
 #define MUTEX_SEM_ID 2
 #define BUFFER_SIZE 128
 
@@ -38,7 +39,7 @@ int readcount = 0;
 void writerJob(int writer_no) {
   printf("[*]@Writer #%d\n", writer_no);
   int ret;
-  int write_sem = disastrOS_openSemaphore(WRITE_SEM_ID, 0);
+  int write_sem = disastrOS_openSemaphore(WRITERS_SEM_ID, 0);
   ERROR_HANDLER(write_sem, "Error opening write_sem in writerJob");
   int i = 0;
   while (i < 100) {
@@ -63,10 +64,10 @@ void writerJob(int writer_no) {
 
 /** Reader **/
 void readerJob(int reader_no) {
-  printf("[*]@Reader #%d\n", consumer_no);
+  printf("[*]@Reader #%d\n", reader_no);
   int ret;
-  int write_sem = disastrOS_openSemaphore(WRITE_SEM_ID, 0);
-  ERROR_HANDLER(fill_sem, "Error opening write_sem in consumerJob");
+  int write_sem = disastrOS_openSemaphore(WRITERS_SEM_ID, 0);
+  ERROR_HANDLER(write_sem, "Error opening write_sem in consumerJob");
   int mutex_sem = disastrOS_openSemaphore(MUTEX_SEM_ID, 0);
   ERROR_HANDLER(mutex_sem, "Error opening mutex_sem in consumerJob");
 
@@ -75,9 +76,9 @@ void readerJob(int reader_no) {
   
     ret = disastrOS_semWait(mutex_sem);
 
-    readercount++;
+    readcount++;
 
-    if(readercount == 1){
+    if(readcount == 1){
         //if you are the first reader, lock the resource from writers.
         ret = disastrOS_semWait(write_sem);
     }
@@ -88,16 +89,16 @@ void readerJob(int reader_no) {
         int readTransaction = transactions[read_index];
         read_index = (read_index + 1) % BUFFER_SIZE;
 
-    reader_count--;
+    readcount--;
 
-    if(reader_count == 0){
+    if(readcount == 0){
         //last reader, can unlock write semaphore
         ret = disastrOS_semPost(write_sem);
     }
 
     i++;
   }
-  }
+  
   
   disastrOS_closeSemaphore(write_sem);
   disastrOS_closeSemaphore(mutex_sem);
@@ -127,7 +128,7 @@ void initFunction(void* args) {
   mutex_sem = disastrOS_openSemaphore(MUTEX_SEM_ID, DSOS_CREATE | DSOS_EXCL, BUFFER_SIZE);
   ERROR_HANDLER(mutex_sem, "Error opening mutex_sem");
 
-  write_sem = disastrOS_openSemaphore(WRITE_SEM_ID, DSOS_CREATE | DSOS_EXCL, 0);
+  write_sem = disastrOS_openSemaphore(WRITERS_SEM_ID, DSOS_CREATE | DSOS_EXCL, 0);
   ERROR_HANDLER(write_sem, "Error opening write_sem");
 
   disastrOS_printStatus();

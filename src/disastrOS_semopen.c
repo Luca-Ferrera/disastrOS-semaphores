@@ -26,7 +26,7 @@ void internal_semOpen(){
     List_insert(&semaphores_list, semaphores_list.last, &(sem->list));
   }
 
-  //  (3) Check that everything is okay
+  // (3) Check that everything is okay
   // We should have the semaphore now, otherwise an error occured
   if (!sem) {
     running->syscall_retvalue = DSOS_ESEMAPHOREOPEN;

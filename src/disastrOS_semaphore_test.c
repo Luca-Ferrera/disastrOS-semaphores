@@ -50,7 +50,7 @@ void producerJob(int producer_no) {
 
       ret = disastrOS_semWait(empty_sem);
       ERROR_HANDLER(ret, "Error waiting empty_sem in producerJob");
-      
+
       ret = disastrOS_semWait(producers_sem);
       ERROR_HANDLER(ret, "Error waiting producers_sem in producerJob");
 
@@ -59,17 +59,19 @@ void producerJob(int producer_no) {
 
       ret = disastrOS_semPost(producers_sem);
       ERROR_HANDLER(ret, "Error posting producers_sem in producerJob");
-      
+
     i++;
-      
+
       ret = disastrOS_semPost(fill_sem);
       ERROR_HANDLER(ret, "Error posting fill_sem in producerJob");
 
     i++;
   }
-  
-  disastrOS_closeSemaphore(empty_sem);
-  disastrOS_closeSemaphore(producers_sem);
+
+  ret = disastrOS_closeSemaphore(empty_sem);
+  ERROR_HANDLER(ret, "Error closing empty_sem in producerJob");
+  ret = disastrOS_closeSemaphore(producers_sem);
+  ERROR_HANDLER(ret, "Error closing producers_sem in producerJob");
 }
 
 /** Consumer **/
@@ -83,10 +85,10 @@ void consumerJob(int consumer_no) {
   int i = 0;
   while (i < 100) {
       ret = disastrOS_semWait(fill_sem);
-      //TODO: manage error
-      
+      ERROR_HANDLER(ret, "Error waiting fill_sem in consumerJob");
+
       ret = disastrOS_semWait(consumers_sem);
-      //TODO: manage error
+      ERROR_HANDLER(ret, "Error waiting consumers_sem in consumerJob");
 
       // get the item and update read_index accordingly
       int lastTransaction = transactions[read_index];
@@ -94,10 +96,10 @@ void consumerJob(int consumer_no) {
       read_index = (read_index + 1) % BUFFER_SIZE;
 
       ret = disastrOS_semPost(consumers_sem);
-      //TODO: manage error
-      
+      ERROR_HANDLER(ret, "Error posting consumers_sem in consumerJob");
+
       ret = disastrOS_semPost(empty_sem);
-      //TODO: manage error
+      ERROR_HANDLER(ret, "Error posting empty_sem in consumerJob");
 
       if (read_index % 10 == 0) {
           printf("After the last 10 transactions balance is now %d.\n", deposit);
@@ -105,9 +107,11 @@ void consumerJob(int consumer_no) {
       i++;
     // disastrOS_sleep(1);
   }
-  
-  disastrOS_closeSemaphore(fill_sem);
-  disastrOS_closeSemaphore(consumers_sem);
+
+  ret = disastrOS_closeSemaphore(fill_sem);
+  ERROR_HANDLER(ret, "Error closing fill_sem in consumerJob");
+  ret = disastrOS_closeSemaphore(consumers_sem);
+  ERROR_HANDLER(ret, "Error closing consumers_sem in consumerJob");
 }
 
 void childFunction(void* args){
@@ -127,6 +131,7 @@ void childFunction(void* args){
 
 
 void initFunction(void* args) {
+  int ret;
   disastrOS_printStatus();
 
   printf("[+]@Init Creating semaphores ... \n");
@@ -177,10 +182,15 @@ void initFunction(void* args) {
   }
 
   printf("[-] Removing semaphores\n");
-  disastrOS_closeSemaphore(empty_sem);
-  disastrOS_closeSemaphore(fill_sem);
-  disastrOS_closeSemaphore(producers_sem);
-  disastrOS_closeSemaphore(consumers_sem);
+  ret = disastrOS_closeSemaphore(empty_sem);
+  ERROR_HANDLER(ret, "Error closing empty_sem");
+  ret = disastrOS_closeSemaphore(fill_sem);
+  ERROR_HANDLER(ret, "Error closing fill_sem");
+  ret = disastrOS_closeSemaphore(producers_sem);
+  ERROR_HANDLER(ret, "Error closing producers_sem");
+  ret = disastrOS_closeSemaphore(consumers_sem);
+  ERROR_HANDLER(ret, "Error closing consumers_sem");
+
   disastrOS_printStatus();
 
   printf("Shutdown!\n");

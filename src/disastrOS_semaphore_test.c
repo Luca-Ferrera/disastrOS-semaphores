@@ -36,7 +36,6 @@ int producers_sem;
 int deposit;
 
 /** Producer **/
-// TODO: Why does the func return a void* ?
 void producerJob(int producer_no) {
   printf("[*]@Producer #%d\n", producer_no);
   int ret;
@@ -49,26 +48,24 @@ void producerJob(int producer_no) {
       // produce the item
       int currentTransaction = 1;
 
-      // printf("[*] Waiting on %d\n", EMPTY_SEM_ID);
       ret = disastrOS_semWait(empty_sem);
-      //TODO: manage error
+      ERROR_HANDLER(ret, "Error waiting empty_sem in producerJob");
       
       ret = disastrOS_semWait(producers_sem);
-      //TODO: manage error
+      ERROR_HANDLER(ret, "Error waiting producers_sem in producerJob");
 
       transactions[write_index] = currentTransaction;
       write_index = (write_index + 1) % BUFFER_SIZE;
 
       ret = disastrOS_semPost(producers_sem);
-      //TODO: manage error
+      ERROR_HANDLER(ret, "Error posting producers_sem in producerJob");
       
     i++;
       
       ret = disastrOS_semPost(fill_sem);
-      //TODO: manage error
+      ERROR_HANDLER(ret, "Error posting fill_sem in producerJob");
 
     i++;
-    // disastrOS_sleep(1);
   }
   
   disastrOS_closeSemaphore(empty_sem);

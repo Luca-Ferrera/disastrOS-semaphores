@@ -49,14 +49,13 @@ void writerJob(int writer_no) {
       int currentTransaction = 1;
 
       ret = disastrOS_semWait(write_sem);
-      //TODO: manage error
+      ERROR_HANDLER(ret, "Error waiting write_sem in producerJob");
 
       transactions[write_index] = currentTransaction;
       write_index = (write_index + 1) % BUFFER_SIZE;
 
       ret = disastrOS_semPost(write_sem);
-      //TODO: manage error
-
+      ERROR_HANDLER(ret, "Error posting write_sem in producerJob");
     i++;
       
   }
@@ -77,14 +76,17 @@ void readerJob(int reader_no) {
   while (i < 100) {
   
     ret = disastrOS_semWait(mutex_sem);
+    ERROR_HANDLER(ret, "Error waiting mutex_sem in producerJob");
 
     readcount++;
 
     if(readcount == 1){
         //if you are the first reader, lock the resource from writers.
         ret = disastrOS_semWait(write_sem);
+        ERROR_HANDLER(ret, "Error waiting write_sem in producerJob");
     }
     ret = disastrOS_semPost(mutex_sem);
+    ERROR_HANDLER(ret, "Error posting mutex_sem in producerJob");
     
 
         // read the item and update read_index accordingly
@@ -96,6 +98,7 @@ void readerJob(int reader_no) {
     if(readcount == 0){
         //last reader, can unlock write semaphore
         ret = disastrOS_semPost(write_sem);
+        ERROR_HANDLER(ret, "Error posting write_sem in producerJob");
     }
 
     i++;

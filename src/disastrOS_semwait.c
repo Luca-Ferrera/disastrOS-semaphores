@@ -25,13 +25,8 @@ void internal_semWait(){
     List_insert(&(sem->waiting_descriptors), sem->waiting_descriptors.last, (ListItem*)sem_desc_ptr);
     running->status = Waiting;
     List_insert(&waiting_list, waiting_list.last, (ListItem*)running);
-    // PCBList_print(&ready_list);
-    //while(!ready_list.size); In theory it should do this 
-    //if(!ready_list.size){
-      //printf("Deadlock detected -> Shutdown!\n");
-      //disastrOS_shutdown();
-    //}
-    //running = (PCB*) List_detach(&ready_list,(ListItem*)ready_list.first); 
+    //In theory it should do this 
+    //while(!ready_list.size); 
   }
   running->syscall_retvalue=0;
 }

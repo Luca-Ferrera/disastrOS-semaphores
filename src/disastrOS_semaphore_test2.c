@@ -13,8 +13,8 @@
     }\
   } while(0);
 
-#define READERS_NUM 1
-#define WRITERS_NUM 1
+#define READERS_NUM 5
+#define WRITERS_NUM 5
 #define WRITERS_SEM_ID 0
 #define MUTEX_SEM_ID 2
 #define BUFFER_SIZE 128
@@ -46,7 +46,7 @@ void writerJob(int writer_no) {
   int i = 0;
   while (i < 100) {
       // produce the item
-      int currentTransaction = 1;
+      int currentTransaction = writer_no;
 
       ret = disastrOS_semWait(write_sem);
       ERROR_HANDLER(ret, "Error waiting write_sem in producerJob");
@@ -68,9 +68,9 @@ void readerJob(int reader_no) {
   printf("[*]@Reader #%d\n", reader_no);
   int ret;
   int write_sem = disastrOS_openSemaphore(WRITERS_SEM_ID, 0);
-  ERROR_HANDLER(write_sem, "Error opening write_sem in consumerJob");
+  ERROR_HANDLER(write_sem, "Error opening write_sem in readerJob");
   int mutex_sem = disastrOS_openSemaphore(MUTEX_SEM_ID, 0);
-  ERROR_HANDLER(mutex_sem, "Error opening mutex_sem in consumerJob");
+  ERROR_HANDLER(mutex_sem, "Error opening mutex_sem in readerJob");
 
   int i = 0;
   while (i < 100) {
@@ -88,9 +88,9 @@ void readerJob(int reader_no) {
     ret = disastrOS_semPost(mutex_sem);
     ERROR_HANDLER(ret, "Error posting mutex_sem in producerJob");
     
-
         // read the item and update read_index accordingly
         int readTransaction = transactions[read_index];
+        printf("Reader %d read something: %d\n", reader_no, readTransaction);
         read_index = (read_index + 1) % BUFFER_SIZE;
 
     readcount--;
@@ -103,7 +103,6 @@ void readerJob(int reader_no) {
 
     i++;
   }
-  
   
   disastrOS_closeSemaphore(write_sem);
   disastrOS_closeSemaphore(mutex_sem);

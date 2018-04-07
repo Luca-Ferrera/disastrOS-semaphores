@@ -41,7 +41,7 @@ int disastrOS_destroyResource(int resource_id);
 ListHead semaphores_list; // global list of semaphores
 
 int disastrOS_openSemaphore(const int sem_id, const int oflag, ...);
-int disastrOS_waitSemaphore(int sem_id);
+int disastrOS_waitSemaphore(int sem_fd);
 int disastrOS_semPost(int sem_id);
 int disastrOS_closeSemaphore(int sem_id);
 

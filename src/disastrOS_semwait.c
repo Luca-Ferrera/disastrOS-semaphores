@@ -10,7 +10,7 @@
 void internal_semWait(){
   int sem_fd = running->syscall_args[0];
 
-  printf("Pid %d requesting semwait on %d semaphore\n", running->pid, sem_fd);
+  printf("Pid %d requesting waitSemaphore on %d semaphore\n", running->pid, sem_fd);
   SemDescriptor* sem_desc = SemDescriptorList_byFd(&(running->sem_descriptors), sem_fd);
   if(!sem_desc){
     running->syscall_retvalue = DSOS_ESEMAPHOREWAIT;

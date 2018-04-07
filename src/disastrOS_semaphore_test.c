@@ -48,10 +48,10 @@ void producerJob(int producer_no) {
       // produce the item
       int currentTransaction = 1;
 
-      ret = disastrOS_semWait(empty_sem);
+      ret = disastrOS_waitSemaphore(empty_sem);
       ERROR_HANDLER(ret, "Error waiting empty_sem in producerJob");
 
-      ret = disastrOS_semWait(producers_sem);
+      ret = disastrOS_waitSemaphore(producers_sem);
       ERROR_HANDLER(ret, "Error waiting producers_sem in producerJob");
 
       transactions[write_index] = currentTransaction;
@@ -84,10 +84,10 @@ void consumerJob(int consumer_no) {
   ERROR_HANDLER(consumers_sem, "Error opening consumers_sem in consumerJob");
   int i = 0;
   while (i < 100) {
-      ret = disastrOS_semWait(fill_sem);
+      ret = disastrOS_waitSemaphore(fill_sem);
       ERROR_HANDLER(ret, "Error waiting fill_sem in consumerJob");
 
-      ret = disastrOS_semWait(consumers_sem);
+      ret = disastrOS_waitSemaphore(consumers_sem);
       ERROR_HANDLER(ret, "Error waiting consumers_sem in consumerJob");
 
       // get the item and update read_index accordingly

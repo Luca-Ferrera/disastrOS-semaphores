@@ -48,7 +48,7 @@ void writerJob(int writer_no) {
       // produce the item
       int currentTransaction = writer_no;
 
-      ret = disastrOS_semWait(write_sem);
+      ret = disastrOS_waitSemaphore(write_sem);
       ERROR_HANDLER(ret, "Error waiting write_sem in producerJob");
 
       transactions[write_index] = currentTransaction;
@@ -75,14 +75,14 @@ void readerJob(int reader_no) {
   int i = 0;
   while (i < 100) {
   
-    ret = disastrOS_semWait(mutex_sem);
+    ret = disastrOS_waitSemaphore(mutex_sem);
     ERROR_HANDLER(ret, "Error waiting mutex_sem in producerJob");
 
     readcount++;
 
     if(readcount == 1){
         //if you are the first reader, lock the resource from writers.
-        ret = disastrOS_semWait(write_sem);
+        ret = disastrOS_waitSemaphore(write_sem);
         ERROR_HANDLER(ret, "Error waiting write_sem in producerJob");
     }
     ret = disastrOS_semPost(mutex_sem);

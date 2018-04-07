@@ -17,5 +17,5 @@ This is the syscall in charg of wait(semaphore) operation.
 
 `int disastrOS_closeSemaphore(int sem_id)`  
 
-This is the syscall in charg of close(semaphore) operation.
+This is the syscall in charg of close(semaphore) operation.     
 *Assigned to:* [@RiccardoBianchini](https://github.com/RiccardoBianchini)

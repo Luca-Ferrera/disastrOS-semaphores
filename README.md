@@ -15,6 +15,6 @@ This is the syscall in charge of signal(semaphore) operation.
 This is the syscall in charg of wait(semaphore) operation.
 *Assigned to:* [@luca ferrera](https://github.com/Luca-Ferrera)
 
-'int disastrOS_closeSemaphore(int sem_id)'
+`int disastrOS_closeSemaphore(int sem_id)`
 This is the syscall in charg of close(semaphore) operation.
 *Assigned to:* [@RiccardoBianchini](https://github.com/RiccardoBianchini)

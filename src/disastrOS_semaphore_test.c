@@ -19,7 +19,8 @@
 #define FILL_SEM_ID 1
 #define PRODUCERS_SEM_ID 2
 #define CONSUMERS_SEM_ID 3
-#define BUFFER_SIZE 128
+#define BUFFER_SIZE 8
+#define TRANSACTIONS_NUMBER 5
 
 typedef struct Child_Args_s {
   int sem_id;
@@ -44,7 +45,7 @@ void producerJob(int producer_no) {
   int producers_sem = disastrOS_openSemaphore(PRODUCERS_SEM_ID, 0);
   ERROR_HANDLER(producers_sem, "Error opening producers_sem in producerJob");
   int i = 0;
-  while (i < 100) {
+  while (i < TRANSACTIONS_NUMBER) {
       // produce the item
       int currentTransaction = 1;
 

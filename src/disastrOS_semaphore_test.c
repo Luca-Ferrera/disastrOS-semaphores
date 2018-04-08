@@ -58,12 +58,12 @@ void producerJob(int producer_no) {
       transactions[write_index] = currentTransaction;
       write_index = (write_index + 1) % BUFFER_SIZE;
 
-      ret = disastrOS_semPost(producers_sem);
+      ret = disastrOS_postSemaphore(producers_sem);
       ERROR_HANDLER(ret, "Error posting producers_sem in producerJob");
 
     i++;
 
-      ret = disastrOS_semPost(fill_sem);
+      ret = disastrOS_postSemaphore(fill_sem);
       ERROR_HANDLER(ret, "Error posting fill_sem in producerJob");
 
     i++;
@@ -96,10 +96,10 @@ void consumerJob(int consumer_no) {
       deposit += lastTransaction;
       read_index = (read_index + 1) % BUFFER_SIZE;
 
-      ret = disastrOS_semPost(consumers_sem);
+      ret = disastrOS_postSemaphore(consumers_sem);
       ERROR_HANDLER(ret, "Error posting consumers_sem in consumerJob");
 
-      ret = disastrOS_semPost(empty_sem);
+      ret = disastrOS_postSemaphore(empty_sem);
       ERROR_HANDLER(ret, "Error posting empty_sem in consumerJob");
 
       if (read_index % 10 == 0) {

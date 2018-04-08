@@ -319,7 +319,7 @@ int disastrOS_waitSemaphore(int sem_fd){
   return disastrOS_syscall(DSOS_CALL_SEMWAIT, sem_fd);
 }
 
-int disastrOS_semPost(int sem_id){
+int disastrOS_postSemaphore(int sem_id){
   return disastrOS_syscall(DSOS_CALL_SEMPOST, sem_id);
 }
 

@@ -11,17 +11,11 @@ void internal_semPost(){
   // The argument is the file descriptor of the semaphore
   int fd = running->syscall_args[0];
 
-  printf("Pid %d requesting sempost on %d semaphore\n", running->pid, fd);
-
-  // Get Semaphore Descriptor from file descriptor  
+  // Get Semaphore Descriptor from file descriptor
   SemDescriptor* sem_desc = SemDescriptorList_byFd(&running->sem_descriptors, fd);
 
-  /*// Finally, get semaphore from SemDescriptor
-  Semaphore* sem = SemaphoreList_byId(&semaphores_list, sem_id);
-  if(!sem){
-    running->syscall_retvalue = DSOS_ESEMAPHOREPOST;
-    return;
-  }*/
+  printf("Pid %d requesting sempost on %d semaphore\n", running->pid, sem_desc->semaphore->id);
+
 
   Semaphore* sem = sem_desc->semaphore;
   sem->count++;
@@ -48,10 +42,10 @@ void internal_semPost(){
     }
 
     printf("Adding process with Pid %d to ready list\n", ready_process->pid);
-    
+
     // Set state of ready process
     ready_process->status = Ready;
-    
+
     //Insert process in ready list
     List_insert(&ready_list, ready_list.last, (ListItem*)ready_process);
   }

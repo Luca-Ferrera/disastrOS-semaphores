@@ -7,4 +7,5 @@
 # Compiled binaries
 disastrOS_test
 disastrOS_semaphore_test
+disastrOS_semaphore_test2
 libdisastrOS.a
